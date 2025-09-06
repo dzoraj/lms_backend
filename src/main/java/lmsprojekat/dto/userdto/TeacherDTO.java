@@ -1,0 +1,74 @@
+package lmsprojekat.dto.userdto;
+
+import java.util.List;
+
+public class TeacherDTO extends RegisteredUserDTO {
+    private String name;
+    private String biography;
+    private String jmbg;
+    private List<Long> titleIds;
+    private List<Long> courseIds;
+    private Long addressId;
+
+    public TeacherDTO() {}
+
+    public TeacherDTO(Long id, String email, List<String> roleNames, List<Long> userOnForumIds,
+                      String name, String biography, String jmbg, List<Long> titleIds,
+                      List<Long> courseIds, Long addressId) {
+        super(id, email, roleNames, userOnForumIds);
+        this.name = name;
+        this.biography = biography;
+        this.jmbg = jmbg;
+        this.titleIds = titleIds;
+        this.courseIds = courseIds;
+        this.addressId = addressId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getBiography() {
+        return biography;
+    }
+
+    public void setBiography(String biography) {
+        this.biography = biography;
+    }
+
+    public String getJmbg() {
+        return jmbg;
+    }
+
+    public void setJmbg(String jmbg) {
+        this.jmbg = jmbg;
+    }
+
+    public List<Long> getTitleIds() {
+        return titleIds;
+    }
+
+    public void setTitleIds(List<Long> titleIds) {
+        this.titleIds = titleIds;
+    }
+
+    public List<Long> getCourseIds() {
+        return courseIds;
+    }
+
+    public void setCourseIds(List<Long> courseIds) {
+        this.courseIds = courseIds;
+    }
+
+    public Long getAddressId() {
+        return addressId;
+    }
+
+    public void setAddressId(Long addressId) {
+        this.addressId = addressId;
+    }
+}
