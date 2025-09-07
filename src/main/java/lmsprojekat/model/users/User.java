@@ -29,7 +29,7 @@ public class User extends SoftDeletableEntity{
     
     @Column(nullable = true)
     private String name;
-    @Column(nullable = true, unique = true)
+    @Column(nullable = true)
     private String jmbg;
 
     @Column(nullable = true, unique = true)
