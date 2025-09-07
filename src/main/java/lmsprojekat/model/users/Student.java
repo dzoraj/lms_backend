@@ -22,8 +22,7 @@ public class Student extends RegisteredUser {
 
 
 
-	@Column(nullable = true)
-    private String name;
+
     @Column(nullable = true)
     private String jmbg;
     
@@ -41,24 +40,17 @@ public class Student extends RegisteredUser {
 		// TODO Auto-generated constructor stub
 	}
 
-	public Student(Long id, String email, String password, List<Role> roles, List<UserOnForum> userOnForums,
-			String name, String jmbg, List<CourseAttendance> courseAttendances, List<StudentInYear> studentInYear,
+	public Student(Long id,String name, String email, String password, List<Role> roles, List<UserOnForum> userOnForums,
+			 String jmbg, List<CourseAttendance> courseAttendances, List<StudentInYear> studentInYear,
 			Address address) {
-		super(id, email, password, roles, userOnForums);
-		this.name = name;
+		super(id,name, email, password, roles, userOnForums);
 		this.jmbg = jmbg;
 		this.courseAttendances = courseAttendances;
 		this.studentInYear = studentInYear;
 		this.address = address;
 	}
 	
-	
-	public String getName() {
-		return name;
-	}
-	public void setName(String name) {
-		this.name = name;
-	}
+
 	public String getJmbg() {
 		return jmbg;
 	}

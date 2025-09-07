@@ -3,7 +3,6 @@ package lmsprojekat.dto.userdto;
 import java.util.List;
 
 public class StudentDTO extends RegisteredUserDTO {
-    private String name;
     private String jmbg;
     private List<Long> courseAttendanceIds;
     private List<Long> studentInYearIds;
@@ -11,26 +10,20 @@ public class StudentDTO extends RegisteredUserDTO {
 
     public StudentDTO() {}
 
-    public StudentDTO(Long id, String email, List<String> roleNames, List<Long> userOnForumIds,
-                      String name, String jmbg, List<Long> courseAttendanceIds,
-                      List<Long> studentInYearIds, Long addressId) {
-        super(id, email, roleNames, userOnForumIds);
-        this.name = name;
-        this.jmbg = jmbg;
-        this.courseAttendanceIds = courseAttendanceIds;
-        this.studentInYearIds = studentInYearIds;
-        this.addressId = addressId;
-    }
 
-    public String getName() {
-        return name;
-    }
+    
 
-    public void setName(String name) {
-        this.name = name;
-    }
 
-    public String getJmbg() {
+    public StudentDTO(Long id, String name, String email, List<String> roleNames, List<Long> userOnForumIds,
+			String jmbg, List<Long> courseAttendanceIds, List<Long> studentInYearIds, Long addressId) {
+		super(id, name, email, roleNames, userOnForumIds);
+		this.jmbg = jmbg;
+		this.courseAttendanceIds = courseAttendanceIds;
+		this.studentInYearIds = studentInYearIds;
+		this.addressId = addressId;
+	}
+
+	public String getJmbg() {
         return jmbg;
     }
 

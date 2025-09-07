@@ -3,7 +3,6 @@ package lmsprojekat.model.university;
 import java.time.LocalDate;
 import java.util.List;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -26,7 +25,7 @@ public class University extends SoftDeletableEntity{
     @Column(nullable = true)  
     private LocalDate establishmentDate;
 
-    @OneToMany(mappedBy = "university", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "university")
     private List<Faculty> faculties;
     
 

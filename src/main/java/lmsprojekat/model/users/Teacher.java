@@ -23,8 +23,6 @@ import lmsprojekat.model.title.Title;
 @Entity
 public class Teacher extends RegisteredUser {
 
-    @Column(nullable = true)
-    private String name;
 
     @Column(nullable = true)
     private String biography;
@@ -47,11 +45,9 @@ public class Teacher extends RegisteredUser {
 	}
 
 
-	public Teacher(Long id, String email, String password, List<Role> roles, List<UserOnForum> userOnForums,
-			String name, String biography, String jmbg, List<Title> titles, List<TeacherOnCourse> courses,
+	public Teacher(Long id,String name, String email, String password, List<Role> roles, List<UserOnForum> userOnForums, String biography, String jmbg, List<Title> titles, List<TeacherOnCourse> courses,
 			Address address) {
-		super(id, email, password, roles, userOnForums);
-		this.name = name;
+		super(id,name, email, password, roles, userOnForums);
 		this.biography = biography;
 		this.jmbg = jmbg;
 		this.titles = titles;
@@ -60,13 +56,6 @@ public class Teacher extends RegisteredUser {
 	}
 
 
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
 
 	public String getBiography() {
 		return biography;

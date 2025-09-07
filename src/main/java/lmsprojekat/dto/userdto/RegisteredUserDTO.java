@@ -7,8 +7,8 @@ public class RegisteredUserDTO extends UserResponseDTO {
 
     public RegisteredUserDTO() {}
 
-    public RegisteredUserDTO(Long id, String email, List<String> roleNames, List<Long> userOnForumIds) {
-        super(id, email, roleNames);
+    public RegisteredUserDTO(Long id,String name, String email, List<String> roleNames, List<Long> userOnForumIds) {
+        super(id,name, email, roleNames);
         this.userOnForumIds = userOnForumIds;
     }
 

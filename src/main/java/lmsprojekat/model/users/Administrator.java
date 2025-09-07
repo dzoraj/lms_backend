@@ -25,9 +25,9 @@ public class Administrator extends RegisteredUser {
 		this.accessLevel = accessLevel;
 	}
 
-	public Administrator(Long id, String email, String password, List<Role> roles, List<UserOnForum> userOnForums,
+	public Administrator(Long id,String name, String email, String password, List<Role> roles, List<UserOnForum> userOnForums,
 			String accessLevel) {
-		super(id, email, password, roles, userOnForums);
+		super(id, name, email, password, roles, userOnForums);
 		this.accessLevel = accessLevel;
 	}
 

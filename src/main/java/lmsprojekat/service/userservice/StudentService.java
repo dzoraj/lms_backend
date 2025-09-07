@@ -48,10 +48,10 @@ public class StudentService extends AbstractCrudService<StudentDTO, Student, Lon
 
         return new StudentDTO(
             student.getId(),
+            student.getName(),
             student.getEmail(),
             roleNames,
             userOnForumIds,
-            student.getName(),
             student.getJmbg(),
             courseAttendanceIds,
             studentInYearIds,
@@ -63,6 +63,7 @@ public class StudentService extends AbstractCrudService<StudentDTO, Student, Lon
     protected Student toEntity(StudentDTO dto) {
         Student student = new Student();
         student.setId(dto.getId());
+        student.setName(dto.getName());
         student.setEmail(dto.getEmail());
 
         student.setName(dto.getName());

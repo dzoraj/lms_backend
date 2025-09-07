@@ -46,10 +46,10 @@ public class TeacherService extends AbstractCrudService<TeacherDTO, Teacher, Lon
 
         return new TeacherDTO(
             teacher.getId(),
+            teacher.getName(),
             teacher.getEmail(),
             roleNames,
             userOnForumIds,
-            teacher.getName(),
             teacher.getBiography(),
             teacher.getJmbg(),
             titleIds,

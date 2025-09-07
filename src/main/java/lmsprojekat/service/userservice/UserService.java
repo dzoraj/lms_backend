@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import lmsprojekat.dto.userdto.UserRequestDTO;
 import lmsprojekat.dto.userdto.UserResponseDTO;
+import lmsprojekat.model.users.Role;
 import lmsprojekat.model.users.User;
 import lmsprojekat.repository.userrepo.UserRepository;
 import lmsprojekat.service.AbstractCrudService;
@@ -29,17 +30,35 @@ public class UserService extends AbstractCrudService<UserRequestDTO, User, Long>
         return userRepository;
     }
 
-    public UserResponseDTO mapToDTO(User user) {
+    private UserResponseDTO mapToDTO(User user) {
         List<String> roleNames = user.getRoles().stream()
                                      .map(r -> r.getName())
                                      .collect(Collectors.toList());
-        return new UserResponseDTO(user.getId(), user.getEmail(), roleNames);
+        return new UserResponseDTO(user.getId(), user.getName(), user.getEmail(), roleNames);
     }
+
+    public List<UserResponseDTO> searchUsers(String query) {
+        String lowerQuery = query.toLowerCase();
+
+        return userRepository.findAll().stream()
+            .filter(u -> 
+                (u.getName() != null && u.getName().toLowerCase().contains(lowerQuery)) ||
+                (u.getEmail() != null && u.getEmail().toLowerCase().contains(lowerQuery)) ||
+                (u.getRoles() != null && u.getRoles().stream()
+                    .map(Role::getName)             
+                    .anyMatch(rn -> rn.toLowerCase().contains(lowerQuery))) 
+            )
+            .map(this::mapToDTO)
+            .collect(Collectors.toList());
+    }
+
+
 
     @Override
     protected User toEntity(UserRequestDTO dto) {
         User user = new User();
         user.setEmail(dto.getEmail());
+        user.setName(dto.getName());
         user.setPassword(passwordEncoder.encode(dto.getPassword())); // BCrypt
         user.setRoles(List.of()); // default no roles on creation
         return user;
@@ -49,7 +68,7 @@ public class UserService extends AbstractCrudService<UserRequestDTO, User, Long>
 
     @Override
     protected UserRequestDTO toDTO(User entity) {
-        return new UserRequestDTO(entity.getId(),entity.getEmail(), "");
+        return new UserRequestDTO(entity.getId(),entity.getName(),entity.getEmail(), "");
     }
 
     @Override

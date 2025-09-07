@@ -45,6 +45,7 @@ public class AdministratorService extends AbstractCrudService<AdministratorDTO, 
 
         return new AdministratorDTO(
                 admin.getId(),
+                admin.getName(),
                 admin.getEmail(),
                 roleNames,
                 userOnForumIds,
@@ -89,13 +90,23 @@ public class AdministratorService extends AbstractCrudService<AdministratorDTO, 
     @Transactional
     public void removeRoleFromUser(Long userId, String roleName) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
-        Role role = roleRepository.findByName(roleName)
-                .orElseThrow(() -> new IllegalArgumentException("Role not found: " + roleName));
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-        if (user.getRoles().contains(role)) {
-            user.getRoles().remove(role);
-            userRepository.save(user);
+        Role role = roleRepository.findByName(roleName)
+                .orElseThrow(() -> new IllegalArgumentException("Role not found"));
+
+        if (!user.getRoles().contains(role)) {
+            throw new IllegalArgumentException("User does not have this role");
         }
+
+        user.getRoles().remove(role);
+
+        if (role.getUsers() != null) {
+            role.getUsers().remove(user);
+        }
+
+        userRepository.save(user);
+        roleRepository.save(role);
     }
+
 }

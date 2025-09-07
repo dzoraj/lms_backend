@@ -26,6 +26,9 @@ public class User extends SoftDeletableEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    
+    @Column(nullable = true)
+    private String name;
 
     @Column(nullable = true, unique = true)
     private String email;
@@ -65,6 +68,14 @@ public class User extends SoftDeletableEntity{
 	}
 
 
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
 	public List<Role> getRoles() {
 		return roles;
 	}
@@ -78,13 +89,16 @@ public class User extends SoftDeletableEntity{
 		// TODO Auto-generated constructor stub
 	}
 
-	public User(Long id, String email, String password, List<Role> roles) {
+	public User(Long id, String name, String email, String password, List<Role> roles) {
 		super();
 		this.id = id;
+		this.name = name;
 		this.email = email;
 		this.password = password;
 		this.roles = roles;
 	}
+
+
 
 
 }

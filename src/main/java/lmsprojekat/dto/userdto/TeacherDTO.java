@@ -12,11 +12,11 @@ public class TeacherDTO extends RegisteredUserDTO {
 
     public TeacherDTO() {}
 
-    public TeacherDTO(Long id, String email, List<String> roleNames, List<Long> userOnForumIds,
-                      String name, String biography, String jmbg, List<Long> titleIds,
+    public TeacherDTO(Long id, String name,String email, List<String> roleNames, List<Long> userOnForumIds,
+                       String biography, String jmbg, List<Long> titleIds,
                       List<Long> courseIds, Long addressId) {
-        super(id, email, roleNames, userOnForumIds);
-        this.name = name;
+        super(id,name, email, roleNames, userOnForumIds);
+
         this.biography = biography;
         this.jmbg = jmbg;
         this.titleIds = titleIds;
