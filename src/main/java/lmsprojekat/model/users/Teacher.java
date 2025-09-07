@@ -27,8 +27,6 @@ public class Teacher extends RegisteredUser {
     @Column(nullable = true)
     private String biography;
 
-    @Column(nullable = true, unique = true)
-    private String jmbg;
 
     @OneToMany(mappedBy = "teacher")
     private List<Title> titles;
@@ -45,11 +43,10 @@ public class Teacher extends RegisteredUser {
 	}
 
 
-	public Teacher(Long id,String name, String email, String password, List<Role> roles, List<UserOnForum> userOnForums, String biography, String jmbg, List<Title> titles, List<TeacherOnCourse> courses,
+	public Teacher(Long id,String name,String jmbg, String email, String password, List<Role> roles, List<UserOnForum> userOnForums, String biography, List<Title> titles, List<TeacherOnCourse> courses,
 			Address address) {
-		super(id,name, email, password, roles, userOnForums);
+		super(id,name, jmbg,email, password, roles, userOnForums);
 		this.biography = biography;
-		this.jmbg = jmbg;
 		this.titles = titles;
 		this.courses = courses;
 		this.address = address;
@@ -65,13 +62,7 @@ public class Teacher extends RegisteredUser {
 		this.biography = biography;
 	}
 
-	public String getJmbg() {
-		return jmbg;
-	}
-
-	public void setJmbg(String jmbg) {
-		this.jmbg = jmbg;
-	}
+	
 
 	public List<Title> getTitles() {
 		return titles;

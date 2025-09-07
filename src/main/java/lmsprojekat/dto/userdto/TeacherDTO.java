@@ -5,20 +5,19 @@ import java.util.List;
 public class TeacherDTO extends RegisteredUserDTO {
     private String name;
     private String biography;
-    private String jmbg;
+ 
     private List<Long> titleIds;
     private List<Long> courseIds;
     private Long addressId;
 
     public TeacherDTO() {}
 
-    public TeacherDTO(Long id, String name,String email, List<String> roleNames, List<Long> userOnForumIds,
-                       String biography, String jmbg, List<Long> titleIds,
+    public TeacherDTO(Long id, String name,String jmbg,String email, List<String> roleNames, List<Long> userOnForumIds,
+                       String biography,  List<Long> titleIds,
                       List<Long> courseIds, Long addressId) {
-        super(id,name, email, roleNames, userOnForumIds);
+        super(id,name,jmbg, email, roleNames, userOnForumIds);
 
         this.biography = biography;
-        this.jmbg = jmbg;
         this.titleIds = titleIds;
         this.courseIds = courseIds;
         this.addressId = addressId;
@@ -40,13 +39,7 @@ public class TeacherDTO extends RegisteredUserDTO {
         this.biography = biography;
     }
 
-    public String getJmbg() {
-        return jmbg;
-    }
 
-    public void setJmbg(String jmbg) {
-        this.jmbg = jmbg;
-    }
 
     public List<Long> getTitleIds() {
         return titleIds;

@@ -17,8 +17,8 @@ public class RegisteredUser extends User {
     
 
 
-	public RegisteredUser(Long id,String name, String email, String password, List<Role> roles, List<UserOnForum> userOnForums) {
-		super(id,name, email, password, roles);
+	public RegisteredUser(Long id,String name,String jmbg, String email, String password, List<Role> roles, List<UserOnForum> userOnForums) {
+		super(id,name, jmbg,email, password, roles);
 		this.userOnForums = userOnForums;
 	}
 

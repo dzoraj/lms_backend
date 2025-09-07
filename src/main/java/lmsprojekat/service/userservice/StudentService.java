@@ -49,10 +49,11 @@ public class StudentService extends AbstractCrudService<StudentDTO, Student, Lon
         return new StudentDTO(
             student.getId(),
             student.getName(),
+            student.getJmbg(),
             student.getEmail(),
+            
             roleNames,
             userOnForumIds,
-            student.getJmbg(),
             courseAttendanceIds,
             studentInYearIds,
             addressId
@@ -64,10 +65,8 @@ public class StudentService extends AbstractCrudService<StudentDTO, Student, Lon
         Student student = new Student();
         student.setId(dto.getId());
         student.setName(dto.getName());
-        student.setEmail(dto.getEmail());
-
-        student.setName(dto.getName());
         student.setJmbg(dto.getJmbg());
+        student.setEmail(dto.getEmail());
 
         if (dto.getAddressId() != null) {
             Address address = new Address();

@@ -5,15 +5,17 @@ import java.util.List;
 public class UserResponseDTO {
 	private Long id;
 	private String name;
+	private String jmbg;
 	private String email;
 	private List<String> roles;
 
 	public UserResponseDTO() {
 	}
 
-	public UserResponseDTO(Long id, String name, String email, List<String> roles) {
+	public UserResponseDTO(Long id, String name,String jmbg, String email, List<String> roles) {
 		this.id = id;
 		this.name = name;
+		this.jmbg = jmbg;
 		this.email = email;
 		this.roles = roles;
 	}
@@ -32,6 +34,15 @@ public class UserResponseDTO {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+	
+
+	public String getJmbg() {
+		return jmbg;
+	}
+
+	public void setJmbg(String jmbg) {
+		this.jmbg = jmbg;
 	}
 
 	public String getEmail() {

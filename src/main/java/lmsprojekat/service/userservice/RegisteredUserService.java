@@ -41,6 +41,7 @@ public class RegisteredUserService extends AbstractCrudService<RegisteredUserDTO
         return new RegisteredUserDTO(
                 entity.getId(),
                 entity.getName(),
+                entity.getJmbg(),
                 entity.getEmail(),
                 roleNames,
                 userOnForumIds

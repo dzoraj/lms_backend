@@ -29,6 +29,8 @@ public class User extends SoftDeletableEntity{
     
     @Column(nullable = true)
     private String name;
+    @Column(nullable = true, unique = true)
+    private String jmbg;
 
     @Column(nullable = true, unique = true)
     private String email;
@@ -53,6 +55,14 @@ public class User extends SoftDeletableEntity{
 
 	public String getEmail() {
 		return email;
+	}
+
+	public String getJmbg() {
+		return jmbg;
+	}
+
+	public void setJmbg(String jmbg) {
+		this.jmbg = jmbg;
 	}
 
 	public void setEmail(String email) {
@@ -89,10 +99,11 @@ public class User extends SoftDeletableEntity{
 		// TODO Auto-generated constructor stub
 	}
 
-	public User(Long id, String name, String email, String password, List<Role> roles) {
+	public User(Long id, String name,String jmbg, String email, String password, List<Role> roles) {
 		super();
 		this.id = id;
 		this.name = name;
+		this.jmbg = jmbg;
 		this.email = email;
 		this.password = password;
 		this.roles = roles;

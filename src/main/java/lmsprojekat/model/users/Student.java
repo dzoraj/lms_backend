@@ -7,7 +7,6 @@ package lmsprojekat.model.users;
 
 import java.util.List;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
@@ -20,12 +19,6 @@ import lmsprojekat.model.subject.CourseAttendance;
 @Entity
 public class Student extends RegisteredUser {
 
-
-
-
-    @Column(nullable = true)
-    private String jmbg;
-    
 
     @OneToMany(mappedBy = "student")
     private List<CourseAttendance> courseAttendances;
@@ -40,23 +33,15 @@ public class Student extends RegisteredUser {
 		// TODO Auto-generated constructor stub
 	}
 
-	public Student(Long id,String name, String email, String password, List<Role> roles, List<UserOnForum> userOnForums,
-			 String jmbg, List<CourseAttendance> courseAttendances, List<StudentInYear> studentInYear,
+	public Student(Long id,String name,String jmbg, String email, String password, List<Role> roles, List<UserOnForum> userOnForums, List<CourseAttendance> courseAttendances, List<StudentInYear> studentInYear,
 			Address address) {
-		super(id,name, email, password, roles, userOnForums);
-		this.jmbg = jmbg;
+		super(id,name,jmbg, email, password, roles, userOnForums);
 		this.courseAttendances = courseAttendances;
 		this.studentInYear = studentInYear;
 		this.address = address;
 	}
 	
 
-	public String getJmbg() {
-		return jmbg;
-	}
-	public void setJmbg(String jmbg) {
-		this.jmbg = jmbg;
-	}
 	public List<CourseAttendance> getCourseAttendances() {
 		return courseAttendances;
 	}

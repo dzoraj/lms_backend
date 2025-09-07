@@ -3,15 +3,17 @@ package lmsprojekat.dto.userdto;
 public class UserRequestDTO {
 	private Long id;
 	private String name;
+	private String jmbg;
 	private String email;
 	private String password;
 
 	public UserRequestDTO() {
 	}
 
-	public UserRequestDTO(Long id, String name, String email, String password) {
+	public UserRequestDTO(Long id, String name,String jmbg, String email, String password) {
 		this.id = id;
 		this.name = name;
+		this.jmbg= jmbg;
 		this.email = email;
 		this.password = password;
 	}
@@ -30,6 +32,14 @@ public class UserRequestDTO {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getJmbg() {
+		return jmbg;
+	}
+
+	public void setJmbg(String jmbg) {
+		this.jmbg = jmbg;
 	}
 
 	public String getEmail() {

@@ -47,11 +47,11 @@ public class TeacherService extends AbstractCrudService<TeacherDTO, Teacher, Lon
         return new TeacherDTO(
             teacher.getId(),
             teacher.getName(),
+            teacher.getJmbg(),
             teacher.getEmail(),
             roleNames,
             userOnForumIds,
             teacher.getBiography(),
-            teacher.getJmbg(),
             titleIds,
             courseIds,
             addressId
@@ -62,10 +62,10 @@ public class TeacherService extends AbstractCrudService<TeacherDTO, Teacher, Lon
     protected Teacher toEntity(TeacherDTO dto) {
         Teacher teacher = new Teacher();
         teacher.setId(dto.getId());
-        teacher.setEmail(dto.getEmail());
         teacher.setName(dto.getName());
-        teacher.setBiography(dto.getBiography());
         teacher.setJmbg(dto.getJmbg());
+        teacher.setEmail(dto.getEmail());
+        teacher.setBiography(dto.getBiography());
 
         if (dto.getAddressId() != null) {
             Address address = new Address();
@@ -85,8 +85,9 @@ public class TeacherService extends AbstractCrudService<TeacherDTO, Teacher, Lon
     @Override
     protected void updateEntity(Teacher teacher, TeacherDTO dto) {
         teacher.setName(dto.getName());
-        teacher.setBiography(dto.getBiography());
         teacher.setJmbg(dto.getJmbg());
+
+        teacher.setBiography(dto.getBiography());
 
         if (dto.getAddressId() != null) {
             Address address = new Address();

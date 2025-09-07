@@ -46,6 +46,7 @@ public class AdministratorService extends AbstractCrudService<AdministratorDTO, 
         return new AdministratorDTO(
                 admin.getId(),
                 admin.getName(),
+                admin.getJmbg(),
                 admin.getEmail(),
                 roleNames,
                 userOnForumIds,

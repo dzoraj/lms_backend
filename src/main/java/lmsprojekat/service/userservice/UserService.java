@@ -34,7 +34,7 @@ public class UserService extends AbstractCrudService<UserRequestDTO, User, Long>
         List<String> roleNames = user.getRoles().stream()
                                      .map(r -> r.getName())
                                      .collect(Collectors.toList());
-        return new UserResponseDTO(user.getId(), user.getName(), user.getEmail(), roleNames);
+        return new UserResponseDTO(user.getId(),user.getName(), user.getJmbg(), user.getEmail(), roleNames);
     }
 
     public List<UserResponseDTO> searchUsers(String query) {
@@ -59,6 +59,7 @@ public class UserService extends AbstractCrudService<UserRequestDTO, User, Long>
         User user = new User();
         user.setEmail(dto.getEmail());
         user.setName(dto.getName());
+        user.setJmbg(dto.getJmbg());
         user.setPassword(passwordEncoder.encode(dto.getPassword())); // BCrypt
         user.setRoles(List.of()); // default no roles on creation
         return user;
@@ -68,14 +69,22 @@ public class UserService extends AbstractCrudService<UserRequestDTO, User, Long>
 
     @Override
     protected UserRequestDTO toDTO(User entity) {
-        return new UserRequestDTO(entity.getId(),entity.getName(),entity.getEmail(), "");
+        return new UserRequestDTO(entity.getId(),entity.getName(),entity.getJmbg(),entity.getEmail(), "");
     }
 
     @Override
     protected void updateEntity(User entity, UserRequestDTO dto) {
-        entity.setEmail(dto.getEmail());
+        if (dto.getName() != null && !dto.getName().isBlank()) {
+            entity.setName(dto.getName());
+        }
+        if (dto.getJmbg() != null && !dto.getJmbg().isBlank()) {
+            entity.setJmbg(dto.getJmbg());
+        }
+        if (dto.getEmail() != null && !dto.getEmail().isBlank()) {
+            entity.setEmail(dto.getEmail());
+        }
         if (dto.getPassword() != null && !dto.getPassword().isBlank()) {
-            entity.setPassword(passwordEncoder.encode(dto.getPassword())); 
+            entity.setPassword(passwordEncoder.encode(dto.getPassword()));
         }
     }
 

@@ -7,8 +7,8 @@ public class AdministratorDTO extends RegisteredUserDTO {
 
     public AdministratorDTO() {}
 
-    public AdministratorDTO(Long id, String name,String email, List<String> roleNames, List<Long> userOnForumIds, String accessLevel) {
-        super(id,name, email, roleNames, userOnForumIds);
+    public AdministratorDTO(Long id, String name,String jmbg,String email, List<String> roleNames, List<Long> userOnForumIds, String accessLevel) {
+        super(id,name, jmbg,email, roleNames, userOnForumIds);
         this.accessLevel = accessLevel;
     }
 

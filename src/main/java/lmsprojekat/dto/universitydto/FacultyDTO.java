@@ -2,21 +2,20 @@ package lmsprojekat.dto.universitydto;
 
 import java.util.List;
 
-import lmsprojekat.dto.userdto.TeacherDTO;
 import lmsprojekat.model.Address;
 
 public class FacultyDTO {
 
     private Long id;
     private String name;
-    private TeacherDTO dean;
-    private UniversityDTO university;
+    private Long dean;
+    private Long university;
     private List<Address> addresses;
 
     public FacultyDTO() {
     }
 
-    public FacultyDTO(Long id, String name, TeacherDTO dean, UniversityDTO university, List<Address> addresses) {
+    public FacultyDTO(Long id, String name, Long dean, Long university, List<Address> addresses) {
         this.id = id;
         this.name = name;
         this.dean = dean;
@@ -40,19 +39,19 @@ public class FacultyDTO {
         this.name = name;
     }
 
-    public TeacherDTO getDean() {
+    public Long getDean() {
         return dean;
     }
 
-    public void setDean(TeacherDTO dean) {
+    public void setDean(Long dean) {
         this.dean = dean;
     }
 
-    public UniversityDTO getUniversity() {
+    public Long getUniversity() {
         return university;
     }
 
-    public void setUniversity(UniversityDTO university) {
+    public void setUniversity(Long university) {
         this.university = university;
     }
 
