@@ -37,6 +37,26 @@ public class JwtUtil {
         return Jwts.builder()
                 .subject(user.getEmail())
                 .claim("roles", roleNames)
+                .claim("id", user.getId()) 
+                .issuedAt(new Date())
+                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60)) // 1 hour
+                .signWith(key)
+                .compact();
+    }
+
+    public String generateTokenFromUserDetails(UserDetails userDetails, Long userId) {
+        List<String> roles = userDetails.getAuthorities()
+                                        .stream()
+                                        .map(auth -> {
+                                            String name = auth.getAuthority();
+                                            return name.startsWith("ROLE_") ? name : "ROLE_" + name;
+                                        })
+                                        .collect(Collectors.toList());
+
+        return Jwts.builder()
+                .subject(userDetails.getUsername())
+                .claim("roles", roles)
+                .claim("id", userId) 
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60)) // 1 hour
                 .signWith(key)
@@ -51,6 +71,27 @@ public class JwtUtil {
                 .getPayload()
                 .getSubject();
     }
+
+    public Long extractUserId(String token) {
+        Object idClaim = Jwts.parser()
+                             .verifyWith(key)
+                             .build()
+                             .parseSignedClaims(token)
+                             .getPayload()
+                             .get("id");  
+
+        if (idClaim instanceof Number) {
+            return ((Number) idClaim).longValue();
+        } else if (idClaim instanceof String) {
+            try {
+                return Long.parseLong((String) idClaim);
+            } catch (NumberFormatException e) {
+                return null;
+            }
+        }
+        return null;
+    }
+
 
     public boolean validateToken(String token, String email) {
         String extractedEmail = extractEmail(token);
@@ -68,23 +109,5 @@ public class JwtUtil {
                 .parseSignedClaims(token)
                 .getPayload()
                 .getExpiration();
-    }
-
-    public String generateTokenFromUserDetails(UserDetails userDetails) {
-        List<String> roles = userDetails.getAuthorities()
-                                        .stream()
-                                        .map(auth -> {
-                                            String name = auth.getAuthority();
-                                            return name.startsWith("ROLE_") ? name : "ROLE_" + name;
-                                        })
-                                        .collect(Collectors.toList());
-
-        return Jwts.builder()
-                .subject(userDetails.getUsername())
-                .claim("roles", roles)
-                .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60)) // 1 hour
-                .signWith(key)
-                .compact();
     }
 }
