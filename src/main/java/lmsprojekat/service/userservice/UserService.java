@@ -6,6 +6,9 @@ import java.util.stream.Collectors;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 import lmsprojekat.dto.userdto.UserRequestDTO;
 import lmsprojekat.dto.userdto.UserResponseDTO;
 import lmsprojekat.model.users.Role;
@@ -19,6 +22,9 @@ public class UserService extends AbstractCrudService<UserRequestDTO, User, Long>
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
+    @PersistenceContext
+    private EntityManager em;
+    
     public UserService(UserRepository userRepository,
                        PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
@@ -94,10 +100,17 @@ public class UserService extends AbstractCrudService<UserRequestDTO, User, Long>
     }
 
 
+    @Transactional
     public UserResponseDTO createUser(UserRequestDTO request) {
-        User saved = getRepository().save(toEntity(request));
-        return mapToDTO(saved);
+        User savedUser = userRepository.save(toEntity(request));
+
+        em.createNativeQuery("INSERT INTO registered_user (id) VALUES (?)")
+          .setParameter(1, savedUser.getId())
+          .executeUpdate();
+
+        return mapToDTO(savedUser);
     }
+
 
     public List<UserResponseDTO> getAllUsers() {
         return getRepository().findAll().stream()
