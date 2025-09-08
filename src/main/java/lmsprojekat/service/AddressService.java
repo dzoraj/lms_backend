@@ -22,44 +22,40 @@ public class AddressService extends AbstractCrudService<AddressDTO, Address, Lon
     }
 
     @Override
-    protected AddressDTO toDTO(Address address) {
+    public AddressDTO toDTO(Address address) {
         AddressDTO dto = new AddressDTO();
         dto.setId(address.getId());
-        dto.setAddressDTO(address.getAddress());
+        dto.setAddress(address.getAddress());
         dto.setNumber(address.getNumber());
         dto.setCity(address.getCity());
         dto.setCountry(address.getCountry());
         dto.setStudent(address.getStudent());
         dto.setTeacher(address.getTeacher());
-        dto.setUniversity(address.getUniversity());
-        dto.setFaculty(address.getFaculty());
+        dto.setUniversityId(address.getUniversity() != null ? address.getUniversity().getId() : null);
+        dto.setFacultyId(address.getFaculty() != null ? address.getFaculty().getId() : null);
         return dto;
     }
 
     @Override
-    protected Address toEntity(AddressDTO dto) {
+    public Address toEntity(AddressDTO dto) {
         Address address = new Address();
         address.setId(dto.getId());
-        address.setAddress(dto.getAddressDTO());
+        address.setAddress(dto.getAddress());
         address.setNumber(dto.getNumber());
         address.setCity(dto.getCity());
         address.setCountry(dto.getCountry());
         address.setStudent(dto.getStudent());
         address.setTeacher(dto.getTeacher());
-        address.setUniversity(dto.getUniversity());
-        address.setFaculty(dto.getFaculty());
         return address;
     }
 
     @Override
-    protected void updateEntity(Address address, AddressDTO dto) {
-        address.setAddress(dto.getAddressDTO());
+    public void updateEntity(Address address, AddressDTO dto) {
+        address.setAddress(dto.getAddress());
         address.setNumber(dto.getNumber());
         address.setCity(dto.getCity());
         address.setCountry(dto.getCountry());
         address.setStudent(dto.getStudent());
         address.setTeacher(dto.getTeacher());
-        address.setUniversity(dto.getUniversity());
-        address.setFaculty(dto.getFaculty());
     }
 }

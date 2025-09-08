@@ -14,16 +14,24 @@ import lmsprojekat.repository.SoftDeleteRepository;
 import lmsprojekat.repository.universityrepo.FacultyRepository;
 import lmsprojekat.repository.universityrepo.UniversityRepository;
 import lmsprojekat.service.AbstractCrudService;
+import lmsprojekat.service.AddressService;
 
 @Service
 public class UniversityService extends AbstractCrudService<UniversityDTO, University, Long> {
 
     private final UniversityRepository universityRepository;
     private final FacultyRepository facultyRepository;
+    private final FacultyService facultyService;
+    private final AddressService addressService;
 
-    public UniversityService(UniversityRepository universityRepository, FacultyRepository facultyRepository) {
+    public UniversityService(UniversityRepository universityRepository,
+                             FacultyRepository facultyRepository,
+                             FacultyService facultyService,
+                             AddressService addressService) {
         this.universityRepository = universityRepository;
         this.facultyRepository = facultyRepository;
+        this.facultyService = facultyService;
+        this.addressService = addressService;
     }
 
     @Override
@@ -34,19 +42,21 @@ public class UniversityService extends AbstractCrudService<UniversityDTO, Univer
     @Override
     protected UniversityDTO toDTO(University entity) {
         List<FacultyDTO> facultyDTOs = entity.getFaculties() != null
-                ? entity.getFaculties().stream().map(faculty -> {
-            FacultyDTO dto = new FacultyDTO();
-            dto.setId(faculty.getId());
-            dto.setName(faculty.getName());
-            return dto;
-        }).collect(Collectors.toList()) : null;
+                ? entity.getFaculties().stream()
+                        .map(facultyService::toDTO)
+                        .collect(Collectors.toList())
+                : null;
 
         return new UniversityDTO(
                 entity.getId(),
                 entity.getName(),
                 entity.getEstablishmentDate(),
                 facultyDTOs,
-                entity.getAddresses()
+                entity.getAddresses() != null
+                        ? entity.getAddresses().stream()
+                                .map(addressService::toDTO)
+                                .collect(Collectors.toList())
+                        : null
         );
     }
 
@@ -54,13 +64,15 @@ public class UniversityService extends AbstractCrudService<UniversityDTO, Univer
     protected University toEntity(UniversityDTO dto) {
         List<Faculty> faculties = null;
         if (dto.getFaculties() != null) {
-            faculties = dto.getFaculties().stream().map(facultyDTO -> {
-                if (facultyDTO.getId() == null) {
-                    throw new IllegalArgumentException("Faculty ID cannot be null when converting UniversityDTO to University entity.");
-                }
-                return facultyRepository.findById(facultyDTO.getId())
-                        .orElseThrow(() -> new EntityNotFoundException("Faculty not found with id: " + facultyDTO.getId()));
-            }).collect(Collectors.toList());
+            faculties = dto.getFaculties().stream()
+                    .map(facultyDTO -> {
+                        if (facultyDTO.getId() == null) {
+                            throw new IllegalArgumentException("Faculty ID cannot be null when converting UniversityDTO to University entity.");
+                        }
+                        return facultyRepository.findById(facultyDTO.getId())
+                                .orElseThrow(() -> new EntityNotFoundException("Faculty not found with id: " + facultyDTO.getId()));
+                    })
+                    .collect(Collectors.toList());
         }
 
         return new University(
@@ -68,7 +80,11 @@ public class UniversityService extends AbstractCrudService<UniversityDTO, Univer
                 dto.getName(),
                 dto.getEstablishmentDate(),
                 faculties,
-                dto.getAddresses()
+                dto.getAddresses() != null
+                        ? dto.getAddresses().stream()
+                                .map(addressService::toEntity)
+                                .collect(Collectors.toList())
+                        : null
         );
     }
 
@@ -78,16 +94,21 @@ public class UniversityService extends AbstractCrudService<UniversityDTO, Univer
         entity.setEstablishmentDate(dto.getEstablishmentDate());
 
         if (dto.getFaculties() != null) {
-            List<Faculty> faculties = dto.getFaculties().stream().map(facultyDTO -> {
-                if (facultyDTO.getId() == null) {
-                    throw new IllegalArgumentException("Faculty ID cannot be null for update.");
-                }
-                return facultyRepository.findById(facultyDTO.getId())
-                        .orElseThrow(() -> new EntityNotFoundException("Faculty not found with id: " + facultyDTO.getId()));
-            }).collect(Collectors.toList());
+            List<Faculty> faculties = dto.getFaculties().stream()
+                    .map(facultyDTO -> {
+                        if (facultyDTO.getId() == null) {
+                            throw new IllegalArgumentException("Faculty ID cannot be null for update.");
+                        }
+                        return facultyRepository.findById(facultyDTO.getId())
+                                .orElseThrow(() -> new EntityNotFoundException("Faculty not found with id: " + facultyDTO.getId()));
+                    }).collect(Collectors.toList());
             entity.setFaculties(faculties);
         }
 
-        entity.setAddresses(dto.getAddresses());
+        if (dto.getAddresses() != null) {
+            entity.setAddresses(dto.getAddresses().stream()
+                    .map(addressService::toEntity)
+                    .collect(Collectors.toList()));
+        }
     }
 }

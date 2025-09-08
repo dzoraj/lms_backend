@@ -1,36 +1,39 @@
 package lmsprojekat.dto;
 
-import lmsprojekat.model.university.Faculty;
-import lmsprojekat.model.university.University;
 import lmsprojekat.model.users.Student;
 import lmsprojekat.model.users.Teacher;
-//Adresa + MESTO + DRZAVA
-//- ulica : String
-//- broj : String
-//- naziv : String(MESTO)
-//- naziv : String(DRZAVA)
-
 
 public class AddressDTO {
 
 	private Long id;
-
-	private String AddressDTO;
-
+	private String address; 
 	private String number;
-
 	private String city;
-
 	private String country;
 
 	private Student student;
-
 	private Teacher teacher;
 
-	private University university;
+	private Long universityId; 
+	private Long facultyId;
 
-	private Faculty faculty;
+	public AddressDTO() {
+	}
 
+	public AddressDTO(Long id, String address, String number, String city, String country, Student student,
+			Teacher teacher, Long universityId, Long facultyId) {
+		this.id = id;
+		this.address = address;
+		this.number = number;
+		this.city = city;
+		this.country = country;
+		this.student = student;
+		this.teacher = teacher;
+		this.universityId = universityId;
+		this.facultyId = facultyId;
+	}
+
+	// getters and setters
 	public Long getId() {
 		return id;
 	}
@@ -39,12 +42,12 @@ public class AddressDTO {
 		this.id = id;
 	}
 
-	public String getAddressDTO() {
-		return AddressDTO;
+	public String getAddress() {
+		return address;
 	}
 
-	public void setAddressDTO(String addressDTO) {
-		AddressDTO = addressDTO;
+	public void setAddress(String address) {
+		this.address = address;
 	}
 
 	public String getNumber() {
@@ -87,38 +90,19 @@ public class AddressDTO {
 		this.teacher = teacher;
 	}
 
-	public University getUniversity() {
-		return university;
+	public Long getUniversityId() {
+		return universityId;
 	}
 
-	public void setUniversity(University university) {
-		this.university = university;
+	public void setUniversityId(Long universityId) {
+		this.universityId = universityId;
 	}
 
-	public Faculty getFaculty() {
-		return faculty;
+	public Long getFacultyId() {
+		return facultyId;
 	}
 
-	public void setFaculty(Faculty faculty) {
-		this.faculty = faculty;
-	}
-
-	public AddressDTO(Long id, String addressDTO, String number, String city, String country, Student student,
-			Teacher teacher, University university, Faculty faculty) {
-		super();
-		this.id = id;
-		AddressDTO = addressDTO;
-		this.number = number;
-		this.city = city;
-		this.country = country;
-		this.student = student;
-		this.teacher = teacher;
-		this.university = university;
-		this.faculty = faculty;
-	}
-
-	public AddressDTO() {
-		super();
-		// TODO Auto-generated constructor stub
+	public void setFacultyId(Long facultyId) {
+		this.facultyId = facultyId;
 	}
 }

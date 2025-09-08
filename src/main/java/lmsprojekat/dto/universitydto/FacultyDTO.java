@@ -2,7 +2,7 @@ package lmsprojekat.dto.universitydto;
 
 import java.util.List;
 
-import lmsprojekat.model.Address;
+import lmsprojekat.dto.AddressDTO;
 
 public class FacultyDTO {
 
@@ -10,12 +10,12 @@ public class FacultyDTO {
     private String name;
     private Long dean;
     private Long university;
-    private List<Address> addresses;
+    private List<AddressDTO> addresses;
 
     public FacultyDTO() {
     }
 
-    public FacultyDTO(Long id, String name, Long dean, Long university, List<Address> addresses) {
+    public FacultyDTO(Long id, String name, Long dean, Long university, List<AddressDTO> addresses) {
         this.id = id;
         this.name = name;
         this.dean = dean;
@@ -55,11 +55,11 @@ public class FacultyDTO {
         this.university = university;
     }
 
-    public List<Address> getAddresses() {
+    public List<AddressDTO> getAddresses() {
         return addresses;
     }
 
-    public void setAddresses(List<Address> addresses) {
+    public void setAddresses(List<AddressDTO> addresses) {
         this.addresses = addresses;
     }
 }
