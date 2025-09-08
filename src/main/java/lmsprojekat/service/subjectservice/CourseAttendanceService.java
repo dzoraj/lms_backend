@@ -1,5 +1,8 @@
 package lmsprojekat.service.subjectservice;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -59,6 +62,7 @@ public class CourseAttendanceService extends AbstractCrudService<CourseAttendanc
                 SubjectDTO subjectDTO = new SubjectDTO();
                 subjectDTO.setId(subject.getId());
                 subjectDTO.setName(subject.getName());
+                subjectDTO.setEspb(subject.getEspb() != null ? subject.getEspb() : 0); 
                 realizationDTO.setSubject(subjectDTO);
             }
 
@@ -67,6 +71,7 @@ public class CourseAttendanceService extends AbstractCrudService<CourseAttendanc
 
         return dto;
     }
+
 
     @Override
     protected CourseAttendance toEntity(CourseAttendanceDTO dto) {
@@ -107,4 +112,11 @@ public class CourseAttendanceService extends AbstractCrudService<CourseAttendanc
             entity.setCourseRealization(realization);
         }
     }
+    public List<CourseAttendanceDTO> findAllByStudentId(Long studentId) {
+        return courseAttendanceRepository.findAllByStudentIdWithRealizationAndSubject(studentId)
+                .stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+    }
+
 }
