@@ -29,7 +29,7 @@ public class SubjectService extends AbstractCrudService<SubjectDTO, Subject, Lon
     }
 
     @Override
-    protected SubjectDTO toDTO(Subject entity) {
+    public SubjectDTO toDTO(Subject entity) {
         if (entity == null) return null;
 
         StudyYearDTO studyYearDTO = null;

@@ -32,7 +32,7 @@ public class EvaluationInstrumentService extends AbstractCrudService<EvaluationI
     }
 
     @Override
-    protected SoftDeleteRepository<EvaluationInstrument, Long> getRepository() {
+    public SoftDeleteRepository<EvaluationInstrument, Long> getRepository() {
         return evaluationInstrumentRepository;
     }
 

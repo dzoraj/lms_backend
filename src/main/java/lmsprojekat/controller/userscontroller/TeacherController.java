@@ -21,4 +21,5 @@ public class TeacherController extends BaseCrudController<TeacherDTO, Long> {
     protected TeacherService getService() {
         return service;
     }
+
 }

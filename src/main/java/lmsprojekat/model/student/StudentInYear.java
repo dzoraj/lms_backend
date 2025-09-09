@@ -25,7 +25,7 @@ public class StudentInYear extends SoftDeletableEntity{
     @Column(nullable = false)
     private LocalDate enrollmentDate;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String indexNumber; 
 
     @ManyToOne
