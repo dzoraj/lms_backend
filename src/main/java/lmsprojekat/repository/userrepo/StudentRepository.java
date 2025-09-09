@@ -31,7 +31,7 @@ public interface StudentRepository extends SoftDeleteRepository<Student, Long> {
 			    @Param("indexNumber") String indexNumber,
 			    @Param("enrollmentYear") Integer enrollmentYear
 			);
-
+	
 
     @Query("""
       SELECT AVG(ca.konacnaOcena)
