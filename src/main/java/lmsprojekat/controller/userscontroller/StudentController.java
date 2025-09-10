@@ -6,8 +6,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import lmsprojekat.controller.BaseCrudController;
+import lmsprojekat.dto.studentdto.StudentProfileDTO;
 import lmsprojekat.dto.userdto.StudentDTO;
-import lmsprojekat.dto.userdto.StudentDashboardDTO;
+import lmsprojekat.service.dashboardservice.StudentDashboardService;
 import lmsprojekat.service.userservice.StudentService;
 
 @RestController
@@ -15,9 +16,13 @@ import lmsprojekat.service.userservice.StudentService;
 public class StudentController extends BaseCrudController<StudentDTO, Long> {
 
     private final StudentService service;
+    private final StudentDashboardService dashboardService;
 
-    public StudentController(StudentService service) {
+
+    public StudentController(StudentService service,StudentDashboardService dashboardService) {
         this.service = service;
+        this.dashboardService = dashboardService;
+
     }
 
     @Override
@@ -26,7 +31,7 @@ public class StudentController extends BaseCrudController<StudentDTO, Long> {
     }
 
     @GetMapping("/dashboard/{id}")
-    public StudentDashboardDTO getDashboard(@PathVariable Long id) {
-        return service.getStudentDashboard(id);
+    public StudentProfileDTO getDashboard(@PathVariable Long id) {
+        return dashboardService.getDashboard(id);
     }
 }
