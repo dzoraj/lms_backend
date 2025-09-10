@@ -30,5 +30,15 @@ public interface EvaluationAttemptRepository extends SoftDeleteRepository<Evalua
 		    @Param("studentId") Long studentId,
 		    @Param("subjectId") Long subjectId
 		);
+	
+	@Query("""
+		    SELECT ea
+		    FROM EvaluationAttempt ea
+		    JOIN ea.studentInYear siy
+		    JOIN siy.student s
+		    WHERE s.id = :studentId
+		""")
+		List<EvaluationAttempt> findAllByStudentId(@Param("studentId") Long studentId);
+
 
     }

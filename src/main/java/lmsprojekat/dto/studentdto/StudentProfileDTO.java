@@ -1,4 +1,3 @@
-
 package lmsprojekat.dto.studentdto;
 
 import java.util.List;
@@ -10,14 +9,16 @@ public class StudentProfileDTO {
 	private String email;
 
 	private Double averageGrade;
-	private Integer ects;
+	private Integer espb;
 
 	private List<EnrollmentDTO> enrollments;
 	private List<PassedExamDTO> passedExams;
+	private List<ExamAttemptDTO> examAttempts;
 	private List<FailedExamDTO> failedExams;
 	private List<String> infractions;
 	private List<String> registeredExams;
 	private String thesis;
+
 
 	public static class EnrollmentDTO {
 		public Long id;
@@ -33,11 +34,20 @@ public class StudentProfileDTO {
 		public Integer finalPoints;
 	}
 
+	public static class ExamAttemptDTO {
+		public String subjectName;
+		public Integer espb;
+		public Long evaluationId;
+		public Integer points;
+		public String note;
+	}
+
 	public static class FailedExamDTO {
 		public String subjectName;
 		public Integer attempts;
 		public Integer lastPoints;
 	}
+
 
 	public Long getId() {
 		return id;
@@ -71,12 +81,12 @@ public class StudentProfileDTO {
 		this.averageGrade = averageGrade;
 	}
 
-	public Integer getEcts() {
-		return ects;
+	public Integer getEspb() {
+		return espb;
 	}
 
-	public void setEcts(Integer ects) {
-		this.ects = ects;
+	public void setEspb(Integer espb) {
+		this.espb = espb;
 	}
 
 	public List<EnrollmentDTO> getEnrollments() {
@@ -93,6 +103,14 @@ public class StudentProfileDTO {
 
 	public void setPassedExams(List<PassedExamDTO> passedExams) {
 		this.passedExams = passedExams;
+	}
+
+	public List<ExamAttemptDTO> getExamAttempts() {
+		return examAttempts;
+	}
+
+	public void setExamAttempts(List<ExamAttemptDTO> examAttempts) {
+		this.examAttempts = examAttempts;
 	}
 
 	public List<FailedExamDTO> getFailedExams() {
@@ -126,7 +144,4 @@ public class StudentProfileDTO {
 	public void setThesis(String thesis) {
 		this.thesis = thesis;
 	}
-	
-	
-
 }

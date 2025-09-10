@@ -1,6 +1,5 @@
 package lmsprojekat.controller.studentcontroller;
 
-
 import java.util.List;
 
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,7 +23,7 @@ public class StudentDirectoryController {
     }
 
     @GetMapping("/teacher/{teacherId}/students")
-    public List<StudentSearchDTO> search(
+    public List<StudentSearchDTO> teacherScopedSearch(
         @PathVariable Long teacherId,
         @RequestParam(required = false) String name,
         @RequestParam(required = false) String indexNumber,
@@ -33,6 +32,17 @@ public class StudentDirectoryController {
         @RequestParam(required = false) Double maxAvg
     ) {
         return svc.teacherScopedSearch(teacherId, name, indexNumber, enrollmentYear, minAvg, maxAvg);
+    }
+
+    @GetMapping("/students/search")
+    public List<StudentSearchDTO> globalSearch(
+        @RequestParam(required = false) String name,
+        @RequestParam(required = false) String indexNumber,
+        @RequestParam(required = false) Integer enrollmentYear,
+        @RequestParam(required = false) Double minAvg,
+        @RequestParam(required = false) Double maxAvg
+    ) {
+        return svc.globalSearch(name, indexNumber, enrollmentYear, minAvg, maxAvg);
     }
 
     @GetMapping("/students/{studentId}/profile")

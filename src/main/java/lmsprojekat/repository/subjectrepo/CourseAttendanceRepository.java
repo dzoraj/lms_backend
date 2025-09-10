@@ -15,4 +15,11 @@ public interface CourseAttendanceRepository extends SoftDeleteRepository<CourseA
            "JOIN FETCH cr.subject s " +
            "WHERE ca.student.id = :studentId AND ca.deleted = false")
     List<CourseAttendance> findAllByStudentIdWithRealizationAndSubject(@Param("studentId") Long studentId);
+    @Query("""
+    	    SELECT ca
+    	    FROM CourseAttendance ca
+    	    WHERE ca.student.id = :studentId
+    	""")
+    	List<CourseAttendance> findAllByStudentId(@Param("studentId") Long studentId);
+
 }
