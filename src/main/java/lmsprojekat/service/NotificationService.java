@@ -124,4 +124,11 @@ public class NotificationService extends AbstractCrudService<NotificationDTO, No
         return teacherOnCourseRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("TeacherOnCourse not found with id: " + id));
     }
+    public List<NotificationDTO> getNotificationsForStudent(Long studentId) {
+        return notificationRepository.findByStudentId(studentId)
+                .stream()
+                .map(this::toDTO)
+                .collect(Collectors.toList());
+    }
+
 }
