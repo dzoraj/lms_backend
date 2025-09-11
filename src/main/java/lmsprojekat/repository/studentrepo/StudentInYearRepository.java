@@ -1,6 +1,7 @@
 package lmsprojekat.repository.studentrepo;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -16,4 +17,7 @@ public interface StudentInYearRepository extends SoftDeleteRepository<StudentInY
 			  ORDER BY siy.enrollmentDate DESC
 			""")
 			List<StudentInYear> findAllByStudentId(@Param("studentId") Long studentId);
+	
+	
+    Optional<StudentInYear> findByStudent_Id(Long studentId);
 }
