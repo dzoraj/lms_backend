@@ -16,7 +16,7 @@ public class TeacherDTO extends RegisteredUserDTO {
                        String biography,  List<Long> titleIds,
                       List<Long> courseIds, Long addressId) {
         super(id,name,jmbg, email, roleNames, userOnForumIds);
-
+        this.name=name;
         this.biography = biography;
         this.titleIds = titleIds;
         this.courseIds = courseIds;
