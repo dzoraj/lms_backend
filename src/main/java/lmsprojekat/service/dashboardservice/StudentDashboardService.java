@@ -1,6 +1,7 @@
 package lmsprojekat.service.dashboardservice;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.stereotype.Service;
 
@@ -74,6 +75,27 @@ public class StudentDashboardService {
                     a.note = ea.getNote();
                     return a;
                 }).toList());
+
+        dto.setAttendingSubjects(
+        	    evalAttemptRepo.findAllByStudentId(studentId).stream()
+        	        .map(ea -> ea.getEvaluation()
+        	                     .getCourseRealization()
+        	                     .getSubject())
+        	        .filter(Objects::nonNull)
+        	        .distinct()
+        	        .map(subj -> {
+        	            var s = new StudentProfileDTO.AttendingSubjectDTO();
+        	            s.subjectId = subj.getId();
+        	            s.name = subj.getName();
+        	            s.espb = subj.getEspb();
+        	            s.lectureCount = subj.getLectureCount();
+        	            s.labCount = subj.getLabCount();
+        	            s.mandatory = subj.getMandatory();
+        	            return s;
+        	        })
+        	        .toList()
+        	);
+
 
         dto.setFailedExams(List.of());
         dto.setInfractions(List.of());

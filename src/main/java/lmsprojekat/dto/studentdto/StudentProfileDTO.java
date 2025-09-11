@@ -18,6 +18,8 @@ public class StudentProfileDTO {
 	private List<String> infractions;
 	private List<String> registeredExams;
 	private String thesis;
+	private List<AttendingSubjectDTO> attendingSubjects;
+
 
 
 	public static class EnrollmentDTO {
@@ -46,6 +48,14 @@ public class StudentProfileDTO {
 		public String subjectName;
 		public Integer attempts;
 		public Integer lastPoints;
+	}
+	public static class AttendingSubjectDTO {
+	    public Long subjectId;
+	    public String name;
+	    public Integer espb;
+	    public Integer lectureCount;
+	    public Integer labCount;
+	    public Boolean mandatory;
 	}
 
 
@@ -143,5 +153,12 @@ public class StudentProfileDTO {
 
 	public void setThesis(String thesis) {
 		this.thesis = thesis;
+	}
+	public List<AttendingSubjectDTO> getAttendingSubjects() {
+	    return attendingSubjects;
+	}
+
+	public void setAttendingSubjects(List<AttendingSubjectDTO> attendingSubjects) {
+	    this.attendingSubjects = attendingSubjects;
 	}
 }
