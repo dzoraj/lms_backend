@@ -2,13 +2,24 @@ package lmsprojekat.controller.userscontroller;
 
 import java.util.List;
 
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import lmsprojekat.controller.BaseCrudController;
 import lmsprojekat.dto.subjectdto.LearningOutcomeDTO;
+import lmsprojekat.dto.teachingdto.EvaluationAttemptDTO;
+import lmsprojekat.dto.teachingdto.ExamApplicationDTO;
 import lmsprojekat.dto.teachingdto.TeachingSessionDTO;
 import lmsprojekat.dto.userdto.TeacherDTO;
 import lmsprojekat.service.subjectservice.SyllabusService;
+import lmsprojekat.service.teachingservice.EvaluationAttemptService;
+import lmsprojekat.service.teachingservice.ExamApplicationService;
 import lmsprojekat.service.userservice.TeacherService;
 
 @RestController
@@ -17,10 +28,17 @@ public class TeacherController extends BaseCrudController<TeacherDTO, Long> {
 
     private final TeacherService teacherService;
     private final SyllabusService syllabusService;
-
-    public TeacherController(TeacherService teacherService, SyllabusService syllabusService) {
+    private final EvaluationAttemptService evaluationAttemptService;
+    private final ExamApplicationService examApplicationService;
+    public TeacherController(
+            TeacherService teacherService,
+            SyllabusService syllabusService,
+            EvaluationAttemptService evaluationAttemptService,ExamApplicationService examApplicationService
+    ) {
         this.teacherService = teacherService;
         this.syllabusService = syllabusService;
+        this.evaluationAttemptService = evaluationAttemptService;
+        this.examApplicationService = examApplicationService;
     }
 
     @Override
@@ -76,4 +94,22 @@ public class TeacherController extends BaseCrudController<TeacherDTO, Long> {
             @PathVariable Long outcomeId) {
         return syllabusService.removeOutcomeFromSession(teacherId, subjectId, sessionId, outcomeId);
     }
+
+    @PostMapping("/{teacherId}/examApplication/{applicationId}/grade")
+    public EvaluationAttemptDTO enterGrade(
+            @PathVariable Long teacherId,
+            @PathVariable Long applicationId,
+            @RequestParam int points,
+            @RequestParam(required = false) String note
+    ) {
+        return evaluationAttemptService.enterGrade(teacherId, applicationId, points, note);
+    }
+    @GetMapping("/{teacherId}/subjects/{subjectId}/examApplications")
+    public List<ExamApplicationDTO> getExamApplications(
+            @PathVariable Long teacherId,
+            @PathVariable Long subjectId
+    ) {
+        return examApplicationService.findByTeacherAndSubject(teacherId, subjectId);
+    }
+
 }

@@ -41,13 +41,18 @@ public class ExamApplicationService extends AbstractCrudService<ExamApplicationD
 
     @Override
     protected ExamApplicationDTO toDTO(ExamApplication entity) {
-        return new ExamApplicationDTO(
-            entity.getId(),
-            entity.getApplicationDate(),
-            entity.getStudentInYear().getId(),
-            entity.getKnowledgeEvaluation().getId()
-        );
+        ExamApplicationDTO dto = new ExamApplicationDTO();
+        dto.setId(entity.getId());
+        dto.setApplicationDate(entity.getApplicationDate());
+        dto.setStudentInYearId(entity.getStudentInYear().getId());
+        dto.setKnowledgeEvaluationId(entity.getKnowledgeEvaluation().getId());
+        dto.setStudentName(entity.getStudentInYear().getStudent().getId().toString());
+        dto.setIndexNumber(entity.getStudentInYear().getIndexNumber());
+        dto.setExamDate(entity.getKnowledgeEvaluation().getStartTime());
+        dto.setEvaluationType(entity.getKnowledgeEvaluation().getEvaluationType().getName());
+        return dto;
     }
+
 
     @Override
     protected ExamApplication toEntity(ExamApplicationDTO dto) {
@@ -90,6 +95,13 @@ public class ExamApplicationService extends AbstractCrudService<ExamApplicationD
             ))
             .collect(Collectors.toList());
     }
+    public List<ExamApplicationDTO> findByTeacherAndSubject(Long teacherId, Long subjectId) {
+        return examApplicationRepository.findByTeacherAndSubject(teacherId, subjectId)
+                .stream()
+                .map(this::toDTO)
+                .toList();
+    }
+
 
 
 }

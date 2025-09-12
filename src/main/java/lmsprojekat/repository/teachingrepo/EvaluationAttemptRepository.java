@@ -40,5 +40,6 @@ public interface EvaluationAttemptRepository extends SoftDeleteRepository<Evalua
 		""")
 		List<EvaluationAttempt> findAllByStudentId(@Param("studentId") Long studentId);
 
+	boolean existsByEvaluation_IdAndStudentInYear_Id(Long evaluationId, Long studentInYearId);
 
     }
