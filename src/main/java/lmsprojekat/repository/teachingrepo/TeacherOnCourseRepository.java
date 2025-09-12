@@ -17,4 +17,11 @@ public interface TeacherOnCourseRepository extends SoftDeleteRepository<TeacherO
            "JOIN cr.subject s " +
            "WHERE toc.teacher.id = :teacherId")
     List<Subject> findSubjectsByTeacherId(@Param("teacherId") Long teacherId);
+
+    @Query("SELECT CASE WHEN COUNT(toc) > 0 THEN true ELSE false END " +
+           "FROM TeacherOnCourse toc " +
+           "JOIN toc.courseRealization cr " +
+           "WHERE toc.teacher.id = :teacherId AND cr.subject.id = :subjectId")
+    boolean existsByTeacherAndSubject(@Param("teacherId") Long teacherId,
+                                      @Param("subjectId") Long subjectId);
 }

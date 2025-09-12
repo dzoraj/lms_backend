@@ -15,10 +15,12 @@ public class LearningOutcomeController extends BaseCrudController<LearningOutcom
 
     public LearningOutcomeController(LearningOutcomeService service) {
         this.service = service;
+
     }
 
     @Override
     protected LearningOutcomeService getService() {
         return service;
     }
+
 }
