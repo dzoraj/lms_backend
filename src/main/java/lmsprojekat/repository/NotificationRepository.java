@@ -21,4 +21,20 @@ public interface NotificationRepository extends SoftDeleteRepository<Notificatio
         WHERE ca.student.id = :studentId
     """)
     List<Notification> findByStudentId(@Param("studentId") Long studentId);
+
+    @Query("""
+        SELECT n 
+        FROM Notification n
+        WHERE n.teacherOnCourse.teacher.id = :teacherId
+    """)
+    List<Notification> findByTeacherId(@Param("teacherId") Long teacherId);
+
+    @Query("""
+        SELECT n
+        FROM Notification n
+        WHERE n.teacherOnCourse.teacher.id = :teacherId
+          AND n.courseRealization.subject.id = :subjectId
+    """)
+    List<Notification> findByTeacherIdAndSubjectId(@Param("teacherId") Long teacherId,
+                                                   @Param("subjectId") Long subjectId);
 }
