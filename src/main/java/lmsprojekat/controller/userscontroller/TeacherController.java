@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 
 import lmsprojekat.controller.BaseCrudController;
 import lmsprojekat.dto.subjectdto.LearningOutcomeDTO;
+import lmsprojekat.dto.teachingdto.TeachingSessionDTO;
 import lmsprojekat.dto.userdto.TeacherDTO;
 import lmsprojekat.service.subjectservice.SyllabusService;
 import lmsprojekat.service.userservice.TeacherService;
@@ -26,7 +27,6 @@ public class TeacherController extends BaseCrudController<TeacherDTO, Long> {
     protected TeacherService getService() {
         return teacherService;
     }
-
 
     @GetMapping("/{teacherId}/subjects/{subjectId}/syllabus")
     public List<LearningOutcomeDTO> getSyllabus(
@@ -49,5 +49,31 @@ public class TeacherController extends BaseCrudController<TeacherDTO, Long> {
             @PathVariable Long subjectId,
             @PathVariable Long outcomeId) {
         syllabusService.deleteOutcome(teacherId, subjectId, outcomeId);
+    }
+
+    @PostMapping("/{teacherId}/subjects/{subjectId}/sessions/{sessionId}/outcomes")
+    public TeachingSessionDTO assignOutcomesToSession(
+            @PathVariable Long teacherId,
+            @PathVariable Long subjectId,
+            @PathVariable Long sessionId,
+            @RequestBody List<Long> outcomeIds) {
+        return syllabusService.assignOutcomesToSession(teacherId, subjectId, sessionId, outcomeIds);
+    }
+
+    @GetMapping("/{teacherId}/subjects/{subjectId}/sessions/{sessionId}/outcomes")
+    public List<LearningOutcomeDTO> getOutcomesForSession(
+            @PathVariable Long teacherId,
+            @PathVariable Long subjectId,
+            @PathVariable Long sessionId) {
+        return syllabusService.getOutcomesForSession(teacherId, subjectId, sessionId);
+    }
+
+    @DeleteMapping("/{teacherId}/subjects/{subjectId}/sessions/{sessionId}/outcomes/{outcomeId}")
+    public TeachingSessionDTO removeOutcomeFromSession(
+            @PathVariable Long teacherId,
+            @PathVariable Long subjectId,
+            @PathVariable Long sessionId,
+            @PathVariable Long outcomeId) {
+        return syllabusService.removeOutcomeFromSession(teacherId, subjectId, sessionId, outcomeId);
     }
 }
