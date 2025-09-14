@@ -41,12 +41,12 @@ public class FileService extends AbstractCrudService<FileDTO, File, Long> {
     }
 
     @Override
-    protected FileRepository getRepository() {
+	public FileRepository getRepository() {
         return fileRepository;
     }
 
     @Override
-    protected FileDTO toDTO(File entity) {
+	public FileDTO toDTO(File entity) {
         return new FileDTO(
                 entity.getId(),
                 entity.getDescription(),
@@ -62,7 +62,7 @@ public class FileService extends AbstractCrudService<FileDTO, File, Long> {
     }
 
     @Override
-    protected File toEntity(FileDTO dto) {
+    public File toEntity(FileDTO dto) {
         File entity = new File();
         entity.setId(dto.getId());
         entity.setDescription(dto.getDescription());
@@ -100,7 +100,7 @@ public class FileService extends AbstractCrudService<FileDTO, File, Long> {
     }
 
     @Override
-    protected void updateEntity(File entity, FileDTO dto) {
+    public void updateEntity(File entity, FileDTO dto) {
         entity.setDescription(dto.getDescription());
         entity.setUrl(dto.getUrl());
 
