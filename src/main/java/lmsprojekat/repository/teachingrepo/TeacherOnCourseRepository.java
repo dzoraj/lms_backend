@@ -1,6 +1,7 @@
 package lmsprojekat.repository.teachingrepo;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -24,4 +25,14 @@ public interface TeacherOnCourseRepository extends SoftDeleteRepository<TeacherO
            "WHERE toc.teacher.id = :teacherId AND cr.subject.id = :subjectId")
     boolean existsByTeacherAndSubject(@Param("teacherId") Long teacherId,
                                       @Param("subjectId") Long subjectId);
+    @Query("""
+    	    SELECT toc
+    	    FROM TeacherOnCourse toc
+    	    JOIN toc.courseRealization cr
+    	    WHERE toc.teacher.id = :teacherId
+    	      AND cr.subject.id = :subjectId
+    	""")
+    	Optional<TeacherOnCourse> findByTeacherAndSubject(@Param("teacherId") Long teacherId,
+    	                                                  @Param("subjectId") Long subjectId);
+
 }

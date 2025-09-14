@@ -66,15 +66,23 @@ public class StudentDashboardService {
                 }).toList());
 
         dto.setExamAttempts(evalAttemptRepo.findAllByStudentId(studentId).stream()
-                .map(ea -> {
-                    var a = new StudentProfileDTO.ExamAttemptDTO();
-                    a.subjectName = ea.getEvaluation().getCourseRealization().getSubject().getName();
-                    a.espb = ea.getEvaluation().getCourseRealization().getSubject().getEspb();
-                    a.evaluationId = ea.getEvaluation().getId();
-                    a.points = ea.getPoints();
-                    a.note = ea.getNote();
-                    return a;
-                }).toList());
+        	    .map(ea -> {
+        	        var a = new StudentProfileDTO.ExamAttemptDTO();
+        	        var ke = ea.getEvaluation();
+        	        var subj = ke.getCourseRealization().getSubject();
+
+        	        a.subjectName = subj.getName();
+        	        a.espb = subj.getEspb();
+        	        a.evaluationId = ke.getId();
+        	        a.points = ea.getPoints();
+        	        a.note = ea.getNote();
+
+        	        a.maxPoints = ke.getPoints();
+        	        a.testPassed = (a.maxPoints != null && a.points != null && a.points >= a.maxPoints / 2);
+
+        	        return a;
+        	    }).toList());
+
 
         dto.setAttendingSubjects(
         	    evalAttemptRepo.findAllByStudentId(studentId).stream()

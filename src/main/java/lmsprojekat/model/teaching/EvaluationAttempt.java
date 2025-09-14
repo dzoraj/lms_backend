@@ -23,6 +23,9 @@ public class EvaluationAttempt extends SoftDeletableEntity{
     @Column
     private String note;
 
+    @Column(nullable = false)
+    private boolean isLatest = true; 
+
     @ManyToOne(optional = true)
     @JoinColumn(name = "evaluation_id")
     private KnowledgeEvaluation evaluation;
@@ -36,12 +39,13 @@ public class EvaluationAttempt extends SoftDeletableEntity{
 		// TODO Auto-generated constructor stub
 	}
 
-	public EvaluationAttempt(Long id, Integer points, String note, KnowledgeEvaluation evaluation,
+	public EvaluationAttempt(Long id, Integer points, String note,boolean isLatest, KnowledgeEvaluation evaluation,
 			StudentInYear studentInYear) {
 		super();
 		this.id = id;
 		this.points = points;
 		this.note = note;
+		this.isLatest = isLatest;
 		this.evaluation = evaluation;
 		this.studentInYear = studentInYear;
 	}
@@ -68,6 +72,15 @@ public class EvaluationAttempt extends SoftDeletableEntity{
 
 	public void setNote(String note) {
 		this.note = note;
+	}
+	
+
+	public boolean isLatest() {
+		return isLatest;
+	}
+
+	public void setLatest(boolean isLatest) {
+		this.isLatest = isLatest;
 	}
 
 	public KnowledgeEvaluation getEvaluation() {

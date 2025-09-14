@@ -135,16 +135,23 @@ public class NotificationService extends AbstractCrudService<NotificationDTO, No
     }
 
     public NotificationDTO createForTeacherAndSubject(Long teacherId, Long subjectId, NotificationDTO dto) {
-        if (!teacherOnCourseRepository.existsByTeacherAndSubject(teacherId, subjectId)) {
-            throw new SecurityException("Teacher is not assigned to this subject.");
-        }
-        Notification entity = toEntity(dto);
+        TeacherOnCourse toc = teacherOnCourseRepository.findByTeacherAndSubject(teacherId, subjectId)
+            .orElseThrow(() -> new SecurityException("Teacher is not assigned to this subject."));
+
+        Notification entity = new Notification();
+        entity.setId(dto.getId());
+        entity.setTitle(dto.getTitle());
+        entity.setContent(dto.getContent());
         entity.setTimePosted(LocalDateTime.now());
+        entity.setTeacherOnCourse(toc);
+        entity.setCourseRealization(toc.getCourseRealization());
+
         entity = notificationRepository.save(entity);
         NotificationDTO savedDto = toDTO(entity);
         messagingTemplate.convertAndSend("/topic/notifications", savedDto);
         return savedDto;
     }
+
 
     public List<NotificationDTO> getNotificationsForTeacherAndSubject(Long teacherId, Long subjectId) {
         return notificationRepository.findByTeacherIdAndSubjectId(teacherId, subjectId)

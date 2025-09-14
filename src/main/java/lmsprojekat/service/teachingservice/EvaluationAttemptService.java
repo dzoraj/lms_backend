@@ -63,6 +63,7 @@ public class EvaluationAttemptService extends AbstractCrudService<EvaluationAtte
                 entity.getId(),
                 entity.getPoints(),
                 entity.getNote(),
+                entity.isLatest(),
                 entity.getEvaluation() != null ? entity.getEvaluation().getId() : null,
                 entity.getStudentInYear() != null ? entity.getStudentInYear().getId() : null
         );
@@ -82,6 +83,7 @@ public class EvaluationAttemptService extends AbstractCrudService<EvaluationAtte
         entity.setId(dto.getId());
         entity.setPoints(dto.getPoints());
         entity.setNote(dto.getNote());
+        entity.setLatest(true);
         entity.setEvaluation(evaluation);
         entity.setStudentInYear(studentInYear);
 
@@ -90,9 +92,7 @@ public class EvaluationAttemptService extends AbstractCrudService<EvaluationAtte
 
     @Override
     protected void updateEntity(EvaluationAttempt entity, EvaluationAttemptDTO dto) {
-        if (dto.getPoints() != null) {
-            entity.setPoints(dto.getPoints());
-        }
+        if (dto.getPoints() != null) entity.setPoints(dto.getPoints());
         entity.setNote(dto.getNote());
 
         if (dto.getEvaluationId() != null) {
@@ -106,71 +106,81 @@ public class EvaluationAttemptService extends AbstractCrudService<EvaluationAtte
                     .orElseThrow(() -> new IllegalArgumentException("Invalid StudentInYear ID: " + dto.getStudentInYearId()));
             entity.setStudentInYear(studentInYear);
         }
+
+        if (entity.getEvaluation() != null && entity.getStudentInYear() != null) {
+            updateFinalSubjectGrade(
+                entity.getStudentInYear().getStudent().getId(),
+                entity.getEvaluation().getCourseRealization().getSubject().getId()
+            );
+        }
     }
 
     @Transactional
     public EvaluationAttemptDTO enterGrade(Long teacherId, Long examApplicationId, int points, String note) {
         ExamApplication application = examApplicationRepository.findAuthorizedApplication(examApplicationId, teacherId);
-        if (application == null) {
-            throw new SecurityException("Teacher is not authorized for this exam application.");
-        }
+        if (application == null) throw new SecurityException("Teacher is not authorized for this exam application.");
 
         KnowledgeEvaluation exam = application.getKnowledgeEvaluation();
-        if (exam == null) {
-            throw new EntityNotFoundException("Exam not found for application.");
-        }
+        if (exam == null) throw new EntityNotFoundException("Exam not found for application.");
 
         if (exam.getEndTime() == null || exam.getEndTime().plusDays(15).isBefore(LocalDateTime.now())) {
             throw new IllegalStateException("Grade entry period expired (15 days after exam).");
         }
 
-        boolean exists = evaluationAttemptRepository.existsByEvaluation_IdAndStudentInYear_Id(
-                exam.getId(),
-                application.getStudentInYear().getId()
+        evaluationAttemptRepository.markOldAttemptsAsNotLatest(
+            application.getStudentInYear().getId(),
+            exam.getCourseRealization().getId(),
+            exam.getEvaluationType().getId()
         );
-        if (exists) {
-            throw new IllegalStateException("Grade already entered for this student.");
-        }
 
         EvaluationAttempt attempt = new EvaluationAttempt();
         attempt.setEvaluation(exam);
         attempt.setStudentInYear(application.getStudentInYear());
         attempt.setPoints(points);
         attempt.setNote(note);
+        attempt.setLatest(true);
         evaluationAttemptRepository.save(attempt);
 
         updateFinalSubjectGrade(
-                application.getStudentInYear().getStudent().getId(),
-                exam.getCourseRealization().getSubject().getId()
+            application.getStudentInYear().getStudent().getId(),
+            exam.getCourseRealization().getSubject().getId()
         );
 
         return toDTO(attempt);
     }
 
-    private void updateFinalSubjectGrade(Long studentId, Long subjectId) {
-        List<Integer> points = evaluationAttemptRepository.findPointsByStudentAndSubject(studentId, subjectId);
-        if (points.isEmpty()) return;
 
-        int totalPoints = points.stream().mapToInt(Integer::intValue).sum();
+    private void updateFinalSubjectGrade(Long studentId, Long subjectId) {
+        List<EvaluationAttempt> attempts = evaluationAttemptRepository.findLatestByStudentAndSubject(studentId, subjectId);
+        if (attempts.isEmpty()) return;
+
+        for (EvaluationAttempt attempt : attempts) {
+            KnowledgeEvaluation ke = attempt.getEvaluation();
+            if (ke != null && ke.getPoints() != null) {
+                int max = ke.getPoints();
+                int pts = attempt.getPoints() != null ? attempt.getPoints() : 0;
+                if (pts < (max / 2)) { // threshold = 50%
+                    setFinalGrade(studentId, subjectId, 5);
+                    return;
+                }
+            }
+        }
+
+        int totalPoints = attempts.stream()
+                .mapToInt(a -> a.getPoints() != null ? a.getPoints() : 0)
+                .sum();
 
         Subject subject = subjectRepository.findById(subjectId)
                 .orElseThrow(() -> new EntityNotFoundException("Subject not found id=" + subjectId));
 
         GradingScheme scheme = subject.getGradingScheme();
-        if (scheme == null) {
-            throw new IllegalStateException("No grading scheme defined for subject " + subjectId);
-        }
-
-        if (scheme.getThreshold() != null && totalPoints < scheme.getThreshold()) {
-            setFinalGrade(studentId, subjectId, 5); // Fail
-            return;
-        }
+        if (scheme == null) throw new IllegalStateException("No grading scheme defined for subject " + subjectId);
 
         List<GradeBoundary> boundaries = scheme.getGradeBoundaries().stream()
                 .sorted(Comparator.comparingInt(GradeBoundary::getMinPoints))
                 .toList();
 
-        int grade = 5; 
+        int grade = 5;
         for (GradeBoundary boundary : boundaries) {
             if (totalPoints >= boundary.getMinPoints()) {
                 grade = boundary.getGradeValue();
@@ -179,7 +189,6 @@ public class EvaluationAttemptService extends AbstractCrudService<EvaluationAtte
 
         setFinalGrade(studentId, subjectId, grade);
     }
-
 
     private void setFinalGrade(Long studentId, Long subjectId, int grade) {
         CourseAttendance ca = courseAttendanceRepository.findByStudentAndSubject(studentId, subjectId);

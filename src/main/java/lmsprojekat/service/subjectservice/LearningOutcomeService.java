@@ -7,6 +7,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.persistence.EntityNotFoundException;
 import lmsprojekat.dto.subjectdto.LearningOutcomeDTO;
+import lmsprojekat.dto.subjectdto.LearningOutcomeFullDTO;
+import lmsprojekat.dto.teachingdto.TeachingMaterialDTO;
 import lmsprojekat.model.subject.LearningOutcome;
 import lmsprojekat.model.subject.Subject;
 import lmsprojekat.model.teaching.EducationalGoal;
@@ -114,4 +116,23 @@ public class LearningOutcomeService extends AbstractCrudService<LearningOutcomeD
             entity.setEducationalGoals(List.of());
         }
     }
+    public LearningOutcomeFullDTO toFullDTO(LearningOutcome entity) {
+        if (entity == null) return null;
+
+        return new LearningOutcomeFullDTO(
+            entity.getId(),
+            entity.getDescription(),
+            entity.getTeachingMaterials() != null
+                ? entity.getTeachingMaterials().stream().map(tm -> new TeachingMaterialDTO(
+                        tm.getId(),
+                        tm.getName(),
+                        tm.getAuthors(),
+                        tm.getYearOfPublication(),
+                        entity.getId(),
+                        tm.getFiles() != null ? tm.getFiles().stream().map(f -> f.getId()).toList() : List.of()
+                  )).toList()
+                : List.of()
+        );
+    }
+
 }

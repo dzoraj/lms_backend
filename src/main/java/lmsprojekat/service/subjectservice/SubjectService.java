@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import lmsprojekat.dto.subjectdto.SubjectDTO;
+import lmsprojekat.dto.subjectdto.SubjectFullDTO;
 import lmsprojekat.model.subject.Subject;
 import lmsprojekat.repository.gradingrepo.GradingSchemeRepository;
 import lmsprojekat.repository.studentrepo.StudyYearRepository;
@@ -17,15 +18,17 @@ public class SubjectService extends AbstractCrudService<SubjectDTO, Subject, Lon
     private final SubjectRepository subjectRepository;
     private final StudyYearRepository studyYearRepository;
     private final GradingSchemeRepository gradingSchemeRepository;
+    private final LearningOutcomeService learningOutcomeService;
 
     public SubjectService(
             SubjectRepository subjectRepository,
             StudyYearRepository studyYearRepository,
-            GradingSchemeRepository gradingSchemeRepository
+            GradingSchemeRepository gradingSchemeRepository, LearningOutcomeService learningOutcomeService
     ) {
         this.subjectRepository = subjectRepository;
         this.studyYearRepository = studyYearRepository;
         this.gradingSchemeRepository = gradingSchemeRepository;
+        this.learningOutcomeService= learningOutcomeService;
     }
 
     @Override
@@ -125,4 +128,24 @@ public class SubjectService extends AbstractCrudService<SubjectDTO, Subject, Lon
                     .orElseThrow(() -> new IllegalArgumentException("GradingScheme not found id=" + dto.getGradingSchemeId())));
         }
     }
+    public SubjectFullDTO toFullDTO(Subject entity) {
+        if (entity == null) return null;
+
+        SubjectFullDTO dto = new SubjectFullDTO();
+        dto.setId(entity.getId());
+        dto.setName(entity.getName());
+        dto.setEspb(entity.getEspb());
+        dto.setMandatory(entity.getMandatory());
+        dto.setLectureCount(entity.getLectureCount());
+        dto.setLabCount(entity.getLabCount());
+
+        dto.setSyllabus(entity.getSyllabus().stream()
+            .filter(lo -> !lo.isDeleted())
+            .map(this.learningOutcomeService::toFullDTO) 
+            .toList()
+        );
+
+        return dto;
+    }
+
 }

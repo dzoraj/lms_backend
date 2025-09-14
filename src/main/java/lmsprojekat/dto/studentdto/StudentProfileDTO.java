@@ -42,6 +42,8 @@ public class StudentProfileDTO {
 		public Long evaluationId;
 		public Integer points;
 		public String note;
+	    public Integer maxPoints;
+	    public boolean testPassed;
 	}
 
 	public static class FailedExamDTO {

@@ -126,20 +126,25 @@ public class StudentDirectoryService {
         prof.setPassedExams(passed);
 
         var attempts = evaluationAttemptRepo.findAllByStudentId(studentId).stream()
-            .map(ea -> {
-                var dto = new StudentProfileDTO.ExamAttemptDTO();
-                var ke = ea.getEvaluation();
-                var cr = ke != null ? ke.getCourseRealization() : null;
-                var subj = cr != null ? cr.getSubject() : null;
+        	    .map(ea -> {
+        	        var dto = new StudentProfileDTO.ExamAttemptDTO();
+        	        var ke = ea.getEvaluation();
+        	        var cr = ke != null ? ke.getCourseRealization() : null;
+        	        var subj = cr != null ? cr.getSubject() : null;
 
-                dto.subjectName = subj != null ? subj.getName() : null;
-                dto.espb = subj != null ? subj.getEspb() : null;
-                dto.evaluationId = ke != null ? ke.getId() : null;
-                dto.points = ea.getPoints();
-                dto.note = ea.getNote();
-                return dto;
-            }).toList();
-        prof.setExamAttempts(attempts);
+        	        dto.subjectName = subj != null ? subj.getName() : null;
+        	        dto.espb = subj != null ? subj.getEspb() : null;
+        	        dto.evaluationId = ke != null ? ke.getId() : null;
+        	        dto.points = ea.getPoints();
+        	        dto.note = ea.getNote();
+
+        	        dto.maxPoints = (ke != null ? ke.getPoints() : null);
+        	        dto.testPassed = (dto.maxPoints != null && dto.points != null && dto.points >= dto.maxPoints / 2);
+
+        	        return dto;
+        	    }).toList();
+        	prof.setExamAttempts(attempts);
+
 
         prof.setFailedExams(List.of());
         prof.setInfractions(List.of());

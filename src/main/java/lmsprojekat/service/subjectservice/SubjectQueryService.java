@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.persistence.EntityNotFoundException;
 import lmsprojekat.dto.subjectdto.SubjectDTO;
+import lmsprojekat.dto.subjectdto.SubjectFullDTO;
 import lmsprojekat.repository.studentrepo.StudyProgramRepository;
 import lmsprojekat.repository.subjectrepo.SubjectRepository;
 import lmsprojekat.repository.userrepo.UserRepository;
@@ -55,25 +56,12 @@ public class SubjectQueryService {
     }
 
 
-    public SubjectDTO getSubjectFull(Long subjectId) {
+    public SubjectFullDTO getSubjectFull(Long subjectId) {
         var subject = subjectRepo.fetchWithSyllabus(subjectId);
         if (subject == null) {
             throw new EntityNotFoundException("Subject not found: " + subjectId);
         }
 
-        SubjectDTO dto = subjectService.toDTO(subject);
-
-        if (subject.getSyllabus() != null) {
-            dto.setSyllabusIds(
-                    subject.getSyllabus().stream()
-                            .filter(lo -> !Boolean.TRUE.equals(lo.isDeleted()))
-                            .map(lo -> lo.getId())
-                            .toList()
-            );
-        } else {
-            dto.setSyllabusIds(List.of());
-        }
-
-        return dto;
+        return subjectService.toFullDTO(subject);
     }
 }

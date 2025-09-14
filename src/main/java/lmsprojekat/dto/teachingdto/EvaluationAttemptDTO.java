@@ -4,16 +4,18 @@ public class EvaluationAttemptDTO {
 	private Long id;
 	private Integer points;
 	private String note;
+    private boolean isLatest; 
 	private Long evaluationId;
 	private Long studentInYearId;
 
 	public EvaluationAttemptDTO() {
 	}
 
-	public EvaluationAttemptDTO(Long id, Integer points, String note, Long evaluationId, Long studentInYearId) {
+	public EvaluationAttemptDTO(Long id, Integer points, String note, boolean isLatest,Long evaluationId, Long studentInYearId) {
 		this.id = id;
 		this.points = points;
 		this.note = note;
+		this.isLatest= isLatest;
 		this.evaluationId = evaluationId;
 		this.studentInYearId = studentInYearId;
 	}
@@ -40,6 +42,17 @@ public class EvaluationAttemptDTO {
 
 	public void setNote(String note) {
 		this.note = note;
+	}
+	
+
+
+
+	public boolean isLatest() {
+		return isLatest;
+	}
+
+	public void setLatest(boolean isLatest) {
+		this.isLatest = isLatest;
 	}
 
 	public Long getEvaluationId() {
