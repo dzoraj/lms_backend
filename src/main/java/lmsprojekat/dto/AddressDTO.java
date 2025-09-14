@@ -1,39 +1,34 @@
 package lmsprojekat.dto;
 
-import lmsprojekat.model.users.Student;
-import lmsprojekat.model.users.Teacher;
-
 public class AddressDTO {
 
 	private Long id;
-	private String address; 
+	private String address;
 	private String number;
 	private String city;
 	private String country;
 
-	private Student student;
-	private Teacher teacher;
-
-	private Long universityId; 
+	private Long studentId;
+	private Long teacherId;
+	private Long universityId;
 	private Long facultyId;
 
 	public AddressDTO() {
 	}
 
-	public AddressDTO(Long id, String address, String number, String city, String country, Student student,
-			Teacher teacher, Long universityId, Long facultyId) {
+	public AddressDTO(Long id, String address, String number, String city, String country, Long studentId,
+			Long teacherId, Long universityId, Long facultyId) {
 		this.id = id;
 		this.address = address;
 		this.number = number;
 		this.city = city;
 		this.country = country;
-		this.student = student;
-		this.teacher = teacher;
+		this.studentId = studentId;
+		this.teacherId = teacherId;
 		this.universityId = universityId;
 		this.facultyId = facultyId;
 	}
 
-	// getters and setters
 	public Long getId() {
 		return id;
 	}
@@ -74,20 +69,20 @@ public class AddressDTO {
 		this.country = country;
 	}
 
-	public Student getStudent() {
-		return student;
+	public Long getStudentId() {
+		return studentId;
 	}
 
-	public void setStudent(Student student) {
-		this.student = student;
+	public void setStudentId(Long studentId) {
+		this.studentId = studentId;
 	}
 
-	public Teacher getTeacher() {
-		return teacher;
+	public Long getTeacherId() {
+		return teacherId;
 	}
 
-	public void setTeacher(Teacher teacher) {
-		this.teacher = teacher;
+	public void setTeacherId(Long teacherId) {
+		this.teacherId = teacherId;
 	}
 
 	public Long getUniversityId() {
@@ -105,4 +100,5 @@ public class AddressDTO {
 	public void setFacultyId(Long facultyId) {
 		this.facultyId = facultyId;
 	}
+
 }

@@ -2,96 +2,95 @@ package lmsprojekat.dto.teachingdto;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import lmsprojekat.model.subject.CourseRealization;
-import lmsprojekat.model.subject.LearningOutcome;
 
 public class KnowledgeEvaluationDTO {
+	private Long id;
+	private LocalDateTime startTime;
+	private LocalDateTime endTime;
+	private Integer points;
+	private Long evaluationInstrumentId;
+	private Long evaluationTypeId;
+	private Long courseRealizationId;
+	private List<Long> learningOutcomeIds;
 
-    private Long id;
-    private LocalDateTime startTime;
-    private LocalDateTime endTime;
-    private Integer points;
-    private EvaluationInstrumentDTO evaluationInstrument;
-    private EvaluationTypeDTO evaluationType;
-    private CourseRealization courseRealization;
-    private List<LearningOutcome> learningOutcomes;
+	public KnowledgeEvaluationDTO() {
+	}
 
-    public KnowledgeEvaluationDTO() {}
+	public KnowledgeEvaluationDTO(Long id, LocalDateTime startTime, LocalDateTime endTime, Integer points,
+			Long evaluationInstrumentId, Long evaluationTypeId, Long courseRealizationId,
+			List<Long> learningOutcomeIds) {
+		this.id = id;
+		this.startTime = startTime;
+		this.endTime = endTime;
+		this.points = points;
+		this.evaluationInstrumentId = evaluationInstrumentId;
+		this.evaluationTypeId = evaluationTypeId;
+		this.courseRealizationId = courseRealizationId;
+		this.learningOutcomeIds = learningOutcomeIds;
+	}
 
-    public KnowledgeEvaluationDTO(Long id, LocalDateTime startTime, LocalDateTime endTime, Integer points,
-            EvaluationInstrumentDTO evaluationInstrument, EvaluationTypeDTO evaluationType,
-            CourseRealization courseRealization, List<LearningOutcome> learningOutcomes) {
-        this.id = id;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.points = points;
-        this.evaluationInstrument = evaluationInstrument;
-        this.evaluationType = evaluationType;
-        this.courseRealization = courseRealization;
-        this.learningOutcomes = learningOutcomes;
-    }
+	public Long getId() {
+		return id;
+	}
 
-    public Long getId() {
-        return id;
-    }
+	public void setId(Long id) {
+		this.id = id;
+	}
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+	public LocalDateTime getStartTime() {
+		return startTime;
+	}
 
-    public LocalDateTime getStartTime() {
-        return startTime;
-    }
+	public void setStartTime(LocalDateTime startTime) {
+		this.startTime = startTime;
+	}
 
-    public void setStartTime(LocalDateTime startTime) {
-        this.startTime = startTime;
-    }
+	public LocalDateTime getEndTime() {
+		return endTime;
+	}
 
-    public LocalDateTime getEndTime() {
-        return endTime;
-    }
+	public void setEndTime(LocalDateTime endTime) {
+		this.endTime = endTime;
+	}
 
-    public void setEndTime(LocalDateTime endTime) {
-        this.endTime = endTime;
-    }
+	public Integer getPoints() {
+		return points;
+	}
 
-    public Integer getPoints() {
-        return points;
-    }
+	public void setPoints(Integer points) {
+		this.points = points;
+	}
 
-    public void setPoints(Integer points) {
-        this.points = points;
-    }
+	public Long getEvaluationInstrumentId() {
+		return evaluationInstrumentId;
+	}
 
-    public EvaluationInstrumentDTO getEvaluationInstrument() {
-        return evaluationInstrument;
-    }
+	public void setEvaluationInstrumentId(Long evaluationInstrumentId) {
+		this.evaluationInstrumentId = evaluationInstrumentId;
+	}
 
-    public void setEvaluationInstrument(EvaluationInstrumentDTO evaluationInstrument) {
-        this.evaluationInstrument = evaluationInstrument;
-    }
+	public Long getEvaluationTypeId() {
+		return evaluationTypeId;
+	}
 
-    public EvaluationTypeDTO getEvaluationType() {
-        return evaluationType;
-    }
+	public void setEvaluationTypeId(Long evaluationTypeId) {
+		this.evaluationTypeId = evaluationTypeId;
+	}
 
-    public void setEvaluationType(EvaluationTypeDTO evaluationType) {
-        this.evaluationType = evaluationType;
-    }
+	public Long getCourseRealizationId() {
+		return courseRealizationId;
+	}
 
-    public CourseRealization getCourseRealization() {
-        return courseRealization;
-    }
+	public void setCourseRealizationId(Long courseRealizationId) {
+		this.courseRealizationId = courseRealizationId;
+	}
 
-    public void setCourseRealization(CourseRealization courseRealization) {
-        this.courseRealization = courseRealization;
-    }
+	public List<Long> getLearningOutcomeIds() {
+		return learningOutcomeIds;
+	}
 
-    public List<LearningOutcome> getLearningOutcomes() {
-        return learningOutcomes;
-    }
+	public void setLearningOutcomeIds(List<Long> learningOutcomeIds) {
+		this.learningOutcomeIds = learningOutcomeIds;
+	}
 
-    public void setLearningOutcomes(List<LearningOutcome> learningOutcomes) {
-        this.learningOutcomes = learningOutcomes;
-    }
 }

@@ -2,64 +2,61 @@ package lmsprojekat.dto.universitydto;
 
 import java.util.List;
 
-import lmsprojekat.dto.AddressDTO;
-
 public class FacultyDTO {
+	private Long id;
+	private String name;
+	private Long deanId;
+	private Long universityId;
+	private List<Long> addressIds;
 
-    private Long id;
-    private String name;
-    private Long dean;
-    private Long university;
-    private List<AddressDTO> addresses;
+	public FacultyDTO() {
+	}
 
-    public FacultyDTO() {
-    }
+	public FacultyDTO(Long id, String name, Long deanId, Long universityId, List<Long> addressIds) {
+		this.id = id;
+		this.name = name;
+		this.deanId = deanId;
+		this.universityId = universityId;
+		this.addressIds = addressIds;
+	}
 
-    public FacultyDTO(Long id, String name, Long dean, Long university, List<AddressDTO> addresses) {
-        this.id = id;
-        this.name = name;
-        this.dean = dean;
-        this.university = university;
-        this.addresses = addresses;
-    }
+	public Long getId() {
+		return id;
+	}
 
-    public Long getId() {
-        return id;
-    }
+	public void setId(Long id) {
+		this.id = id;
+	}
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public String getName() {
-        return name;
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	public Long getDeanId() {
+		return deanId;
+	}
 
-    public Long getDean() {
-        return dean;
-    }
+	public void setDeanId(Long deanId) {
+		this.deanId = deanId;
+	}
 
-    public void setDean(Long dean) {
-        this.dean = dean;
-    }
+	public Long getUniversityId() {
+		return universityId;
+	}
 
-    public Long getUniversity() {
-        return university;
-    }
+	public void setUniversityId(Long universityId) {
+		this.universityId = universityId;
+	}
 
-    public void setUniversity(Long university) {
-        this.university = university;
-    }
+	public List<Long> getAddressIds() {
+		return addressIds;
+	}
 
-    public List<AddressDTO> getAddresses() {
-        return addresses;
-    }
-
-    public void setAddresses(List<AddressDTO> addresses) {
-        this.addresses = addresses;
-    }
+	public void setAddressIds(List<Long> addressIds) {
+		this.addressIds = addressIds;
+	}
 }

@@ -2,54 +2,84 @@ package lmsprojekat.dto.subjectdto;
 
 import java.util.List;
 
-import lmsprojekat.dto.teachingdto.EducationalGoalDTO;
-import lmsprojekat.dto.teachingdto.KnowledgeEvaluationDTO;
-import lmsprojekat.dto.teachingdto.TeachingMaterialDTO;
-import lmsprojekat.dto.teachingdto.TeachingSessionDTO;
-
 public class LearningOutcomeDTO {
 
     private Long id;
-    private String description; 
-    private SubjectDTO subject;
-    private List<EducationalGoalDTO> educationalGoals;
-    private List<TeachingMaterialDTO> teachingMaterials;
-    private List<KnowledgeEvaluationDTO> knowledgeEvaluations;
-    private List<TeachingSessionDTO> teachingSessions;
+    private String description;
+    private Long subjectId;
+    private List<Long> educationalGoalIds;
+    private List<Long> teachingMaterialIds;
+    private List<Long> knowledgeEvaluationIds;
+    private List<Long> teachingSessionIds;
 
     public LearningOutcomeDTO() {}
 
-    public LearningOutcomeDTO(Long id, String description, SubjectDTO subject, List<EducationalGoalDTO> educationalGoals,
-            List<TeachingMaterialDTO> teachingMaterials, List<KnowledgeEvaluationDTO> knowledgeEvaluations,
-            List<TeachingSessionDTO> teachingSessions) {
+    public LearningOutcomeDTO(Long id, String description, Long subjectId,
+            List<Long> educationalGoalIds, List<Long> teachingMaterialIds,
+            List<Long> knowledgeEvaluationIds, List<Long> teachingSessionIds) {
         this.id = id;
         this.description = description;
-        this.subject = subject;
-        this.educationalGoals = educationalGoals;
-        this.teachingMaterials = teachingMaterials;
-        this.knowledgeEvaluations = knowledgeEvaluations;
-        this.teachingSessions = teachingSessions;
+        this.subjectId = subjectId;
+        this.educationalGoalIds = educationalGoalIds;
+        this.teachingMaterialIds = teachingMaterialIds;
+        this.knowledgeEvaluationIds = knowledgeEvaluationIds;
+        this.teachingSessionIds = teachingSessionIds;
     }
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+	public Long getId() {
+		return id;
+	}
 
-    public String getDescription() { return description; }
-    public void setDescription(String description) { this.description = description; }
+	public void setId(Long id) {
+		this.id = id;
+	}
 
-    public SubjectDTO getSubject() { return subject; }
-    public void setSubject(SubjectDTO subject) { this.subject = subject; }
+	public String getDescription() {
+		return description;
+	}
 
-    public List<EducationalGoalDTO> getEducationalGoals() { return educationalGoals; }
-    public void setEducationalGoals(List<EducationalGoalDTO> educationalGoals) { this.educationalGoals = educationalGoals; }
+	public void setDescription(String description) {
+		this.description = description;
+	}
 
-    public List<TeachingMaterialDTO> getTeachingMaterials() { return teachingMaterials; }
-    public void setTeachingMaterials(List<TeachingMaterialDTO> teachingMaterials) { this.teachingMaterials = teachingMaterials; }
+	public Long getSubjectId() {
+		return subjectId;
+	}
 
-    public List<KnowledgeEvaluationDTO> getKnowledgeEvaluations() { return knowledgeEvaluations; }
-    public void setKnowledgeEvaluations(List<KnowledgeEvaluationDTO> knowledgeEvaluations) { this.knowledgeEvaluations = knowledgeEvaluations; }
+	public void setSubjectId(Long subjectId) {
+		this.subjectId = subjectId;
+	}
 
-    public List<TeachingSessionDTO> getTeachingSessions() { return teachingSessions; }
-    public void setTeachingSessions(List<TeachingSessionDTO> teachingSessions) { this.teachingSessions = teachingSessions; }
+	public List<Long> getEducationalGoalIds() {
+		return educationalGoalIds;
+	}
+
+	public void setEducationalGoalIds(List<Long> educationalGoalIds) {
+		this.educationalGoalIds = educationalGoalIds;
+	}
+
+	public List<Long> getTeachingMaterialIds() {
+		return teachingMaterialIds;
+	}
+
+	public void setTeachingMaterialIds(List<Long> teachingMaterialIds) {
+		this.teachingMaterialIds = teachingMaterialIds;
+	}
+
+	public List<Long> getKnowledgeEvaluationIds() {
+		return knowledgeEvaluationIds;
+	}
+
+	public void setKnowledgeEvaluationIds(List<Long> knowledgeEvaluationIds) {
+		this.knowledgeEvaluationIds = knowledgeEvaluationIds;
+	}
+
+	public List<Long> getTeachingSessionIds() {
+		return teachingSessionIds;
+	}
+
+	public void setTeachingSessionIds(List<Long> teachingSessionIds) {
+		this.teachingSessionIds = teachingSessionIds;
+	}
 
 }

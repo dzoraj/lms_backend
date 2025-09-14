@@ -4,16 +4,16 @@ public class CourseAttendanceDTO {
 
 	private Long id;
 	private Integer konacnaOcena;
-	private CourseRealizationDTO courseRealization;
+	private Long courseRealizationId;
 	private Long studentId;
 
 	public CourseAttendanceDTO() {
 	}
 
-	public CourseAttendanceDTO(Long id, Integer konacnaOcena, CourseRealizationDTO courseRealization, Long studentId) {
+	public CourseAttendanceDTO(Long id, Integer konacnaOcena, Long courseRealizationId, Long studentId) {
 		this.id = id;
 		this.konacnaOcena = konacnaOcena;
-		this.courseRealization = courseRealization;
+		this.courseRealizationId = courseRealizationId;
 		this.studentId = studentId;
 	}
 
@@ -33,12 +33,12 @@ public class CourseAttendanceDTO {
 		this.konacnaOcena = konacnaOcena;
 	}
 
-	public CourseRealizationDTO getCourseRealization() {
-		return courseRealization;
+	public Long getCourseRealizationId() {
+		return courseRealizationId;
 	}
 
-	public void setCourseRealization(CourseRealizationDTO courseRealization) {
-		this.courseRealization = courseRealization;
+	public void setCourseRealizationId(Long courseRealizationId) {
+		this.courseRealizationId = courseRealizationId;
 	}
 
 	public Long getStudentId() {
@@ -48,5 +48,4 @@ public class CourseAttendanceDTO {
 	public void setStudentId(Long studentId) {
 		this.studentId = studentId;
 	}
-
 }

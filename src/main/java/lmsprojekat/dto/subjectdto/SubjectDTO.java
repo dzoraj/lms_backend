@@ -2,81 +2,155 @@ package lmsprojekat.dto.subjectdto;
 
 import java.util.List;
 
-import lmsprojekat.dto.studentdto.StudyYearDTO;
-
 public class SubjectDTO {
 
-    private Long id;
-    private String name;
-    private Integer espb;
-    private Boolean mandatory;
-    private Integer lectureCount;
-    private Integer labCount;
-    private Integer otherTeachingForms;
-    private Integer researchWork;
-    private Integer otherClasses;
-    private StudyYearDTO studyYear;
-    private List<LearningOutcomeDTO> syllabus;
-    private List<SubjectDTO> subSubjects;
-    private SubjectDTO parentSubject;
+	private Long id;
+	private String name;
+	private Integer espb;
+	private Boolean mandatory;
+	private Integer lectureCount;
+	private Integer labCount;
+	private Integer otherTeachingForms;
+	private Integer researchWork;
+	private Integer otherClasses;
+	private Long studyYearId;
+	private List<Long> syllabusIds;
+	private List<Long> subSubjectIds;
+	private Long parentSubjectId;
+	private Long gradingSchemeId;
 
-    public SubjectDTO() {}
+	public SubjectDTO() {
+	}
 
-    public SubjectDTO(Long id, String name, Integer espb, Boolean mandatory, Integer lectureCount, Integer labCount,
-            Integer otherTeachingForms, Integer researchWork, Integer otherClasses, StudyYearDTO studyYear,
-            List<LearningOutcomeDTO> syllabus, List<SubjectDTO> subSubjects, SubjectDTO parentSubject) {
-        this.id = id;
-        this.name = name;
-        this.espb = espb;
-        this.mandatory = mandatory;
-        this.lectureCount = lectureCount;
-        this.labCount = labCount;
-        this.otherTeachingForms = otherTeachingForms;
-        this.researchWork = researchWork;
-        this.otherClasses = otherClasses;
-        this.studyYear = studyYear;
-        this.syllabus = syllabus;
-        this.subSubjects = subSubjects;
-        this.parentSubject = parentSubject;
-    }
+	public SubjectDTO(Long id, String name, Integer espb, Boolean mandatory, Integer lectureCount, Integer labCount,
+			Integer otherTeachingForms, Integer researchWork, Integer otherClasses, Long studyYearId,
+			List<Long> syllabusIds, List<Long> subSubjectIds, Long parentSubjectId, Long gradingSchemeId) {
+		this.id = id;
+		this.name = name;
+		this.espb = espb;
+		this.mandatory = mandatory;
+		this.lectureCount = lectureCount;
+		this.labCount = labCount;
+		this.otherTeachingForms = otherTeachingForms;
+		this.researchWork = researchWork;
+		this.otherClasses = otherClasses;
+		this.studyYearId = studyYearId;
+		this.syllabusIds = syllabusIds;
+		this.subSubjectIds = subSubjectIds;
+		this.parentSubjectId = parentSubjectId;
+		this.gradingSchemeId = gradingSchemeId;
+	}
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+	public Long getId() {
+		return id;
+	}
 
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+	public void setId(Long id) {
+		this.id = id;
+	}
 
-    public Integer getEspb() { return espb; }
-    public void setEspb(Integer espb) { this.espb = espb; }
+	public String getName() {
+		return name;
+	}
 
-    public Boolean getMandatory() { return mandatory; }
-    public void setMandatory(Boolean mandatory) { this.mandatory = mandatory; }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    public Integer getLectureCount() { return lectureCount; }
-    public void setLectureCount(Integer lectureCount) { this.lectureCount = lectureCount; }
+	public Integer getEspb() {
+		return espb;
+	}
 
-    public Integer getLabCount() { return labCount; }
-    public void setLabCount(Integer labCount) { this.labCount = labCount; }
+	public void setEspb(Integer espb) {
+		this.espb = espb;
+	}
 
-    public Integer getOtherTeachingForms() { return otherTeachingForms; }
-    public void setOtherTeachingForms(Integer otherTeachingForms) { this.otherTeachingForms = otherTeachingForms; }
+	public Boolean getMandatory() {
+		return mandatory;
+	}
 
-    public Integer getResearchWork() { return researchWork; }
-    public void setResearchWork(Integer researchWork) { this.researchWork = researchWork; }
+	public void setMandatory(Boolean mandatory) {
+		this.mandatory = mandatory;
+	}
 
-    public Integer getOtherClasses() { return otherClasses; }
-    public void setOtherClasses(Integer otherClasses) { this.otherClasses = otherClasses; }
+	public Integer getLectureCount() {
+		return lectureCount;
+	}
 
-    public StudyYearDTO getStudyYear() { return studyYear; }
-    public void setStudyYear(StudyYearDTO studyYear) { this.studyYear = studyYear; }
+	public void setLectureCount(Integer lectureCount) {
+		this.lectureCount = lectureCount;
+	}
 
-    public List<LearningOutcomeDTO> getSyllabus() { return syllabus; }
-    public void setSyllabus(List<LearningOutcomeDTO> syllabus) { this.syllabus = syllabus; }
+	public Integer getLabCount() {
+		return labCount;
+	}
 
-    public List<SubjectDTO> getSubSubjects() { return subSubjects; }
-    public void setSubSubjects(List<SubjectDTO> subSubjects) { this.subSubjects = subSubjects; }
+	public void setLabCount(Integer labCount) {
+		this.labCount = labCount;
+	}
 
-    public SubjectDTO getParentSubject() { return parentSubject;
-    
-    }
-    }
+	public Integer getOtherTeachingForms() {
+		return otherTeachingForms;
+	}
+
+	public void setOtherTeachingForms(Integer otherTeachingForms) {
+		this.otherTeachingForms = otherTeachingForms;
+	}
+
+	public Integer getResearchWork() {
+		return researchWork;
+	}
+
+	public void setResearchWork(Integer researchWork) {
+		this.researchWork = researchWork;
+	}
+
+	public Integer getOtherClasses() {
+		return otherClasses;
+	}
+
+	public void setOtherClasses(Integer otherClasses) {
+		this.otherClasses = otherClasses;
+	}
+
+	public Long getStudyYearId() {
+		return studyYearId;
+	}
+
+	public void setStudyYearId(Long studyYearId) {
+		this.studyYearId = studyYearId;
+	}
+
+	public List<Long> getSyllabusIds() {
+		return syllabusIds;
+	}
+
+	public void setSyllabusIds(List<Long> syllabusIds) {
+		this.syllabusIds = syllabusIds;
+	}
+
+	public List<Long> getSubSubjectIds() {
+		return subSubjectIds;
+	}
+
+	public void setSubSubjectIds(List<Long> subSubjectIds) {
+		this.subSubjectIds = subSubjectIds;
+	}
+
+	public Long getParentSubjectId() {
+		return parentSubjectId;
+	}
+
+	public void setParentSubjectId(Long parentSubjectId) {
+		this.parentSubjectId = parentSubjectId;
+	}
+
+	public Long getGradingSchemeId() {
+		return gradingSchemeId;
+	}
+
+	public void setGradingSchemeId(Long gradingSchemeId) {
+		this.gradingSchemeId = gradingSchemeId;
+	}
+
+}

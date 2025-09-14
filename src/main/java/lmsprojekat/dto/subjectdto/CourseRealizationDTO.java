@@ -2,54 +2,84 @@ package lmsprojekat.dto.subjectdto;
 
 import java.util.List;
 
-import lmsprojekat.dto.NotificationDTO;
-import lmsprojekat.dto.teachingdto.KnowledgeEvaluationDTO;
-import lmsprojekat.dto.teachingdto.TeacherOnCourseDTO;
-import lmsprojekat.dto.teachingdto.TeachingSessionDTO;
-
 public class CourseRealizationDTO {
 
     private Long id;
-    private SubjectDTO subject;
-    private List<TeacherOnCourseDTO> teachersOnCourse;
-    private List<CourseAttendanceDTO> courseAttendances;
-    private List<NotificationDTO> notifications;
-    private List<KnowledgeEvaluationDTO> knowledgeEvaluations;
-    private List<TeachingSessionDTO> teachingSessions;
+    private Long subjectId;
+    private List<Long> teacherOnCourseIds;
+    private List<Long> courseAttendanceIds;
+    private List<Long> notificationIds;
+    private List<Long> knowledgeEvaluationIds;
+    private List<Long> teachingSessionIds;
 
     public CourseRealizationDTO() {}
 
-    public CourseRealizationDTO(Long id, SubjectDTO subject, List<TeacherOnCourseDTO> teachersOnCourse,
-            List<CourseAttendanceDTO> courseAttendances, List<NotificationDTO> notifications,
-            List<KnowledgeEvaluationDTO> knowledgeEvaluations, List<TeachingSessionDTO> teachingSessions) {
+    public CourseRealizationDTO(Long id, Long subjectId, List<Long> teacherOnCourseIds,
+            List<Long> courseAttendanceIds, List<Long> notificationIds,
+            List<Long> knowledgeEvaluationIds, List<Long> teachingSessionIds) {
         this.id = id;
-        this.subject = subject;
-        this.teachersOnCourse = teachersOnCourse;
-        this.courseAttendances = courseAttendances;
-        this.notifications = notifications;
-        this.knowledgeEvaluations = knowledgeEvaluations;
-        this.teachingSessions = teachingSessions;
+        this.subjectId = subjectId;
+        this.teacherOnCourseIds = teacherOnCourseIds;
+        this.courseAttendanceIds = courseAttendanceIds;
+        this.notificationIds = notificationIds;
+        this.knowledgeEvaluationIds = knowledgeEvaluationIds;
+        this.teachingSessionIds = teachingSessionIds;
     }
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+	public Long getId() {
+		return id;
+	}
 
-    public SubjectDTO getSubject() { return subject; }
-    public void setSubject(SubjectDTO subject) { this.subject = subject; }
+	public void setId(Long id) {
+		this.id = id;
+	}
 
-    public List<TeacherOnCourseDTO> getTeachersOnCourse() { return teachersOnCourse; }
-    public void setTeachersOnCourse(List<TeacherOnCourseDTO> teachersOnCourse) { this.teachersOnCourse = teachersOnCourse; }
+	public Long getSubjectId() {
+		return subjectId;
+	}
 
-    public List<CourseAttendanceDTO> getCourseAttendances() { return courseAttendances; }
-    public void setCourseAttendances(List<CourseAttendanceDTO> courseAttendances) { this.courseAttendances = courseAttendances; }
+	public void setSubjectId(Long subjectId) {
+		this.subjectId = subjectId;
+	}
 
-    public List<NotificationDTO> getNotifications() { return notifications; }
-    public void setNotifications(List<NotificationDTO> notifications) { this.notifications = notifications; }
+	public List<Long> getTeacherOnCourseIds() {
+		return teacherOnCourseIds;
+	}
 
-    public List<KnowledgeEvaluationDTO> getKnowledgeEvaluations() { return knowledgeEvaluations; }
-    public void setKnowledgeEvaluations(List<KnowledgeEvaluationDTO> knowledgeEvaluations) { this.knowledgeEvaluations = knowledgeEvaluations; }
+	public void setTeacherOnCourseIds(List<Long> teacherOnCourseIds) {
+		this.teacherOnCourseIds = teacherOnCourseIds;
+	}
 
-    public List<TeachingSessionDTO> getTeachingSessions() { return teachingSessions; }
-    public void setTeachingSessions(List<TeachingSessionDTO> teachingSessions) { this.teachingSessions = teachingSessions; }
+	public List<Long> getCourseAttendanceIds() {
+		return courseAttendanceIds;
+	}
+
+	public void setCourseAttendanceIds(List<Long> courseAttendanceIds) {
+		this.courseAttendanceIds = courseAttendanceIds;
+	}
+
+	public List<Long> getNotificationIds() {
+		return notificationIds;
+	}
+
+	public void setNotificationIds(List<Long> notificationIds) {
+		this.notificationIds = notificationIds;
+	}
+
+	public List<Long> getKnowledgeEvaluationIds() {
+		return knowledgeEvaluationIds;
+	}
+
+	public void setKnowledgeEvaluationIds(List<Long> knowledgeEvaluationIds) {
+		this.knowledgeEvaluationIds = knowledgeEvaluationIds;
+	}
+
+	public List<Long> getTeachingSessionIds() {
+		return teachingSessionIds;
+	}
+
+	public void setTeachingSessionIds(List<Long> teachingSessionIds) {
+		this.teachingSessionIds = teachingSessionIds;
+	}
 
 }

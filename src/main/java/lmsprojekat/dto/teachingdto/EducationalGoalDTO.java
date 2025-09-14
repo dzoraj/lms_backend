@@ -2,43 +2,41 @@ package lmsprojekat.dto.teachingdto;
 
 import java.util.List;
 
-import lmsprojekat.dto.subjectdto.LearningOutcomeDTO;
-
 public class EducationalGoalDTO {
+	private Long id;
+	private String description;
+	private List<Long> learningOutcomeIds;
 
-    private Long id;
-    private String description;
-    private List<LearningOutcomeDTO> learningOutcomes;
+	public EducationalGoalDTO() {
+	}
 
-    public EducationalGoalDTO() {}
+	public EducationalGoalDTO(Long id, String description, List<Long> learningOutcomeIds) {
+		this.id = id;
+		this.description = description;
+		this.learningOutcomeIds = learningOutcomeIds;
+	}
 
-    public EducationalGoalDTO(Long id, String description, List<LearningOutcomeDTO> learningOutcomes) {
-        this.id = id;
-        this.description = description;
-        this.learningOutcomes = learningOutcomes;
-    }
+	public Long getId() {
+		return id;
+	}
 
-    public Long getId() {
-        return id;
-    }
+	public void setId(Long id) {
+		this.id = id;
+	}
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+	public String getDescription() {
+		return description;
+	}
 
-    public String getDescription() {
-        return description;
-    }
+	public void setDescription(String description) {
+		this.description = description;
+	}
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+	public List<Long> getLearningOutcomeIds() {
+		return learningOutcomeIds;
+	}
 
-    public List<LearningOutcomeDTO> getLearningOutcomes() {
-        return learningOutcomes;
-    }
-
-    public void setLearningOutcomes(List<LearningOutcomeDTO> learningOutcomes) {
-        this.learningOutcomes = learningOutcomes;
-    }
+	public void setLearningOutcomeIds(List<Long> learningOutcomeIds) {
+		this.learningOutcomeIds = learningOutcomeIds;
+	}
 }

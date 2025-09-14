@@ -1,45 +1,26 @@
 package lmsprojekat.dto.teachingdto;
 
-
 import java.util.List;
 
-import lmsprojekat.model.Notification;
-import lmsprojekat.model.subject.CourseRealization;
-import lmsprojekat.model.teaching.TeachingType;
-import lmsprojekat.model.users.Teacher;
-
 public class TeacherOnCourseDTO {
-
-
-    private Long id;
-
-    private Integer numberOfClasses;
-
-    private Teacher teacher;
-
-
-    private TeachingType teachingType;
-
-
-    private CourseRealization courseRealization;
-    
-
-    private List<Notification> notifications;
+	private Long id;
+	private Integer numberOfClasses;
+	private Long teacherId;
+	private Long teachingTypeId;
+	private Long courseRealizationId;
+	private List<Long> notificationIds;
 
 	public TeacherOnCourseDTO() {
-		super();
-		// TODO Auto-generated constructor stub
 	}
 
-	public TeacherOnCourseDTO(Long id, Integer numberOfClasses, Teacher teacher, TeachingType teachingType,
-			CourseRealization courseRealization, List<Notification> notifications) {
-		super();
+	public TeacherOnCourseDTO(Long id, Integer numberOfClasses, Long teacherId, Long teachingTypeId,
+			Long courseRealizationId, List<Long> notificationIds) {
 		this.id = id;
 		this.numberOfClasses = numberOfClasses;
-		this.teacher = teacher;
-		this.teachingType = teachingType;
-		this.courseRealization = courseRealization;
-		this.notifications = notifications;
+		this.teacherId = teacherId;
+		this.teachingTypeId = teachingTypeId;
+		this.courseRealizationId = courseRealizationId;
+		this.notificationIds = notificationIds;
 	}
 
 	public Long getId() {
@@ -58,36 +39,36 @@ public class TeacherOnCourseDTO {
 		this.numberOfClasses = numberOfClasses;
 	}
 
-	public Teacher getTeacher() {
-		return teacher;
+	public Long getTeacherId() {
+		return teacherId;
 	}
 
-	public void setTeacher(Teacher teacher) {
-		this.teacher = teacher;
+	public void setTeacherId(Long teacherId) {
+		this.teacherId = teacherId;
 	}
 
-	public TeachingType getTeachingType() {
-		return teachingType;
+	public Long getTeachingTypeId() {
+		return teachingTypeId;
 	}
 
-	public void setTeachingType(TeachingType teachingType) {
-		this.teachingType = teachingType;
+	public void setTeachingTypeId(Long teachingTypeId) {
+		this.teachingTypeId = teachingTypeId;
 	}
 
-	public CourseRealization getCourseRealization() {
-		return courseRealization;
+	public Long getCourseRealizationId() {
+		return courseRealizationId;
 	}
 
-	public void setCourseRealization(CourseRealization courseRealization) {
-		this.courseRealization = courseRealization;
+	public void setCourseRealizationId(Long courseRealizationId) {
+		this.courseRealizationId = courseRealizationId;
 	}
 
-	public List<Notification> getNotifications() {
-		return notifications;
+	public List<Long> getNotificationIds() {
+		return notificationIds;
 	}
 
-	public void setNotifications(List<Notification> notifications) {
-		this.notifications = notifications;
+	public void setNotificationIds(List<Long> notificationIds) {
+		this.notificationIds = notificationIds;
 	}
 
 }

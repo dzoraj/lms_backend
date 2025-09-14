@@ -3,50 +3,84 @@ package lmsprojekat.dto;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import lmsprojekat.dto.subjectdto.CourseRealizationDTO;
-import lmsprojekat.dto.teachingdto.TeacherOnCourseDTO;
-
 public class NotificationDTO {
-    private Long id;
-    private String title;
-    private String content;
-    private LocalDateTime timePosted;
-    private CourseRealizationDTO courseRealization;
-    private TeacherOnCourseDTO teacherOnCourse;
-    private List<FileDTO> attachments;
+	private Long id;
+	private String title;
+	private String content;
+	private LocalDateTime timePosted;
 
-    public NotificationDTO() {}
+	private Long courseRealizationId;
+	private Long teacherOnCourseId;
+	private List<Long> attachmentIds;
 
-    public NotificationDTO(Long id, String title, String content, LocalDateTime timePosted,
-                           CourseRealizationDTO courseRealization, TeacherOnCourseDTO teacherOnCourse,
-                           List<FileDTO> attachments) {
-        this.id = id;
-        this.title = title;
-        this.content = content;
-        this.timePosted = timePosted;
-        this.courseRealization = courseRealization;
-        this.teacherOnCourse = teacherOnCourse;
-        this.attachments = attachments;
-    }
+	public NotificationDTO() {
+	}
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+	public NotificationDTO(Long id, String title, String content, LocalDateTime timePosted, Long courseRealizationId,
+			Long teacherOnCourseId, List<Long> attachmentIds) {
+		this.id = id;
+		this.title = title;
+		this.content = content;
+		this.timePosted = timePosted;
+		this.courseRealizationId = courseRealizationId;
+		this.teacherOnCourseId = teacherOnCourseId;
+		this.attachmentIds = attachmentIds;
+	}
 
-    public String getTitle() { return title; }
-    public void setTitle(String title) { this.title = title; }
+	public Long getId() {
+		return id;
+	}
 
-    public String getContent() { return content; }
-    public void setContent(String content) { this.content = content; }
+	public void setId(Long id) {
+		this.id = id;
+	}
 
-    public LocalDateTime getTimePosted() { return timePosted; }
-    public void setTimePosted(LocalDateTime timePosted) { this.timePosted = timePosted; }
+	public String getTitle() {
+		return title;
+	}
 
-    public CourseRealizationDTO getCourseRealization() { return courseRealization; }
-    public void setCourseRealization(CourseRealizationDTO courseRealization) { this.courseRealization = courseRealization; }
+	public void setTitle(String title) {
+		this.title = title;
+	}
 
-    public TeacherOnCourseDTO getTeacherOnCourse() { return teacherOnCourse; }
-    public void setTeacherOnCourse(TeacherOnCourseDTO teacherOnCourse) { this.teacherOnCourse = teacherOnCourse; }
+	public String getContent() {
+		return content;
+	}
 
-    public List<FileDTO> getAttachments() { return attachments; }
-    public void setAttachments(List<FileDTO> attachments) { this.attachments = attachments; }
+	public void setContent(String content) {
+		this.content = content;
+	}
+
+	public LocalDateTime getTimePosted() {
+		return timePosted;
+	}
+
+	public void setTimePosted(LocalDateTime timePosted) {
+		this.timePosted = timePosted;
+	}
+
+	public Long getCourseRealizationId() {
+		return courseRealizationId;
+	}
+
+	public void setCourseRealizationId(Long courseRealizationId) {
+		this.courseRealizationId = courseRealizationId;
+	}
+
+	public Long getTeacherOnCourseId() {
+		return teacherOnCourseId;
+	}
+
+	public void setTeacherOnCourseId(Long teacherOnCourseId) {
+		this.teacherOnCourseId = teacherOnCourseId;
+	}
+
+	public List<Long> getAttachmentIds() {
+		return attachmentIds;
+	}
+
+	public void setAttachmentIds(List<Long> attachmentIds) {
+		this.attachmentIds = attachmentIds;
+	}
+
 }

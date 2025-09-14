@@ -12,6 +12,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import lmsprojekat.model.SoftDeletableEntity;
+import lmsprojekat.model.grading.GradingScheme;
 import lmsprojekat.model.student.StudyYear;
 
 //Predmet
@@ -25,55 +26,58 @@ import lmsprojekat.model.student.StudyYear;
 //- ostaliCasovi : Integer
 
 @Entity
-public class Subject extends SoftDeletableEntity{
+public class Subject extends SoftDeletableEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    @Column(nullable = true)
-    private String name;
+	@Column(nullable = true)
+	private String name;
 
-    @Column(nullable = true)
-    private Integer espb;
+	@Column(nullable = true)
+	private Integer espb;
 
-    @Column(nullable = true)
-    private Boolean mandatory;
+	@Column(nullable = true)
+	private Boolean mandatory;
 
-    @Column(nullable = true)
-    private Integer lectureCount;
+	@Column(nullable = true)
+	private Integer lectureCount;
 
-    @Column(nullable = true)
-    private Integer labCount;
+	@Column(nullable = true)
+	private Integer labCount;
 
-    @Column(nullable = true)
-    private Integer otherTeachingForms;
+	@Column(nullable = true)
+	private Integer otherTeachingForms;
 
-    @Column(nullable = true)
-    private Integer researchWork;
+	@Column(nullable = true)
+	private Integer researchWork;
 
-    @Column(nullable = true)
-    private Integer otherClasses;
-    
-    @ManyToOne
-    @JoinColumn(name = "study_year_id")
-    private StudyYear studyYear;
-    
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "subject_id")
-    private List<LearningOutcome> syllabus; 
-    //silabus je skup ishoda sto znaci da sam dobro uradio
-    //jer je ovo List ishoda 
+	@Column(nullable = true)
+	private Integer otherClasses;
 
-    
-    //AGREGACIJA PREDMETA SAMOG U SEBE
-    @OneToMany
-    @JoinColumn(name = "parent_subject_id")
-    private List<Subject> subSubjects;
+	@ManyToOne
+	@JoinColumn(name = "study_year_id")
+	private StudyYear studyYear;
 
-    @ManyToOne
-    @JoinColumn(name = "parent_subject_id", insertable = false, updatable = false)
-    private Subject parentSubject;
+	@OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+	@JoinColumn(name = "subject_id")
+	private List<LearningOutcome> syllabus;
+	// silabus je skup ishoda sto znaci da sam dobro uradio
+	// jer je ovo List ishoda
+
+	// AGREGACIJA PREDMETA SAMOG U SEBE
+	@OneToMany
+	@JoinColumn(name = "parent_subject_id")
+	private List<Subject> subSubjects;
+
+	@ManyToOne
+	@JoinColumn(name = "parent_subject_id", insertable = false, updatable = false)
+	private Subject parentSubject;
+
+	@ManyToOne
+	@JoinColumn(name = "grading_scheme_id")
+	private GradingScheme gradingScheme;
 
 	public Subject() {
 		super();
@@ -201,6 +205,14 @@ public class Subject extends SoftDeletableEntity{
 
 	public void setParentSubject(Subject parentSubject) {
 		this.parentSubject = parentSubject;
+	}
+
+	public GradingScheme getGradingScheme() {
+		return gradingScheme;
+	}
+
+	public void setGradingScheme(GradingScheme gradingScheme) {
+		this.gradingScheme = gradingScheme;
 	}
 
 }
