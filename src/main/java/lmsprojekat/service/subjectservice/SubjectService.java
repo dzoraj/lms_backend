@@ -1,26 +1,31 @@
 package lmsprojekat.service.subjectservice;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import lmsprojekat.dto.studentdto.StudyYearDTO;
 import lmsprojekat.dto.subjectdto.SubjectDTO;
-import lmsprojekat.model.student.StudyYear;
 import lmsprojekat.model.subject.Subject;
+import lmsprojekat.repository.gradingrepo.GradingSchemeRepository;
 import lmsprojekat.repository.studentrepo.StudyYearRepository;
 import lmsprojekat.repository.subjectrepo.SubjectRepository;
 import lmsprojekat.service.AbstractCrudService;
-
 @Service
 public class SubjectService extends AbstractCrudService<SubjectDTO, Subject, Long> {
 
     private final SubjectRepository subjectRepository;
     private final StudyYearRepository studyYearRepository;
+    private final GradingSchemeRepository gradingSchemeRepository;
 
-    public SubjectService(SubjectRepository subjectRepository, StudyYearRepository studyYearRepository) {
+    public SubjectService(
+            SubjectRepository subjectRepository,
+            StudyYearRepository studyYearRepository,
+            GradingSchemeRepository gradingSchemeRepository
+    ) {
         this.subjectRepository = subjectRepository;
         this.studyYearRepository = studyYearRepository;
+        this.gradingSchemeRepository = gradingSchemeRepository;
     }
 
     @Override
@@ -32,30 +37,30 @@ public class SubjectService extends AbstractCrudService<SubjectDTO, Subject, Lon
     public SubjectDTO toDTO(Subject entity) {
         if (entity == null) return null;
 
-        StudyYearDTO studyYearDTO = null;
-        if (entity.getStudyYear() != null) {
-            studyYearDTO = new StudyYearDTO(
-                entity.getStudyYear().getId(),
-                entity.getStudyYear().getEnrollmentDate(),
-                entity.getStudyYear().getStudyProgram() != null ? entity.getStudyYear().getStudyProgram().getId() : null
-            );
-        }
+        SubjectDTO dto = new SubjectDTO();
+        dto.setId(entity.getId());
+        dto.setName(entity.getName());
+        dto.setEspb(entity.getEspb());
+        dto.setMandatory(entity.getMandatory());
+        dto.setLectureCount(entity.getLectureCount());
+        dto.setLabCount(entity.getLabCount());
+        dto.setOtherTeachingForms(entity.getOtherTeachingForms());
+        dto.setResearchWork(entity.getResearchWork());
+        dto.setOtherClasses(entity.getOtherClasses());
 
-        return new SubjectDTO(
-            entity.getId(),
-            entity.getName(),
-            entity.getEspb(),
-            entity.getMandatory(),
-            entity.getLectureCount(),
-            entity.getLabCount(),
-            entity.getOtherTeachingForms(),
-            entity.getResearchWork(),
-            entity.getOtherClasses(),
-            studyYearDTO,
-            null, 
-            null, // add mapping later
-            entity.getParentSubject() != null ? new SubjectDTO(entity.getParentSubject().getId(), null, null, null, null, null, null, null, null, null, null, null, null) : null
-        );
+        dto.setStudyYearId(entity.getStudyYear() != null ? entity.getStudyYear().getId() : null);
+        dto.setParentSubjectId(entity.getParentSubject() != null ? entity.getParentSubject().getId() : null);
+        dto.setGradingSchemeId(entity.getGradingScheme() != null ? entity.getGradingScheme().getId() : null);
+
+        dto.setSyllabusIds(entity.getSyllabus() != null
+                ? entity.getSyllabus().stream().map(s -> s.getId()).toList()
+                : List.of());
+
+        dto.setSubSubjectIds(entity.getSubSubjects() != null
+                ? entity.getSubSubjects().stream().map(s -> s.getId()).toList()
+                : List.of());
+
+        return dto;
     }
 
     @Override
@@ -63,7 +68,6 @@ public class SubjectService extends AbstractCrudService<SubjectDTO, Subject, Lon
         if (dto == null) return null;
 
         Subject entity = new Subject();
-
         entity.setId(dto.getId());
         entity.setName(dto.getName());
         entity.setEspb(dto.getEspb());
@@ -74,20 +78,23 @@ public class SubjectService extends AbstractCrudService<SubjectDTO, Subject, Lon
         entity.setResearchWork(dto.getResearchWork());
         entity.setOtherClasses(dto.getOtherClasses());
 
-        if (dto.getStudyYear() != null && dto.getStudyYear().getId() != null) {
-            StudyYear studyYear = studyYearRepository.findById(dto.getStudyYear().getId())
-                .orElseThrow(() -> new IllegalArgumentException("StudyYear not found with id " + dto.getStudyYear().getId()));
-            entity.setStudyYear(studyYear);
+        if (dto.getStudyYearId() != null) {
+            entity.setStudyYear(studyYearRepository.findById(dto.getStudyYearId())
+                    .orElseThrow(() -> new IllegalArgumentException("StudyYear not found id=" + dto.getStudyYearId())));
+        }
+
+        if (dto.getParentSubjectId() != null) {
+            entity.setParentSubject(subjectRepository.findById(dto.getParentSubjectId())
+                    .orElseThrow(() -> new IllegalArgumentException("Parent Subject not found id=" + dto.getParentSubjectId())));
+        }
+
+        if (dto.getGradingSchemeId() != null) {
+            entity.setGradingScheme(gradingSchemeRepository.findById(dto.getGradingSchemeId())
+                    .orElseThrow(() -> new IllegalArgumentException("GradingScheme not found id=" + dto.getGradingSchemeId())));
         }
 
         entity.setSyllabus(new ArrayList<>());
         entity.setSubSubjects(new ArrayList<>());
-
-        if (dto.getParentSubject() != null && dto.getParentSubject().getId() != null) {
-            Subject parent = subjectRepository.findById(dto.getParentSubject().getId())
-                .orElseThrow(() -> new IllegalArgumentException("Parent Subject not found with id " + dto.getParentSubject().getId()));
-            entity.setParentSubject(parent);
-        }
 
         return entity;
     }
@@ -103,16 +110,19 @@ public class SubjectService extends AbstractCrudService<SubjectDTO, Subject, Lon
         if (dto.getResearchWork() != null) entity.setResearchWork(dto.getResearchWork());
         if (dto.getOtherClasses() != null) entity.setOtherClasses(dto.getOtherClasses());
 
-        if (dto.getStudyYear() != null && dto.getStudyYear().getId() != null) {
-            StudyYear studyYear = studyYearRepository.findById(dto.getStudyYear().getId())
-                .orElseThrow(() -> new IllegalArgumentException("StudyYear not found with id " + dto.getStudyYear().getId()));
-            entity.setStudyYear(studyYear);
+        if (dto.getStudyYearId() != null) {
+            entity.setStudyYear(studyYearRepository.findById(dto.getStudyYearId())
+                    .orElseThrow(() -> new IllegalArgumentException("StudyYear not found id=" + dto.getStudyYearId())));
         }
 
-        if (dto.getParentSubject() != null && dto.getParentSubject().getId() != null) {
-            Subject parent = subjectRepository.findById(dto.getParentSubject().getId())
-                .orElseThrow(() -> new IllegalArgumentException("Parent Subject not found with id " + dto.getParentSubject().getId()));
-            entity.setParentSubject(parent);
+        if (dto.getParentSubjectId() != null) {
+            entity.setParentSubject(subjectRepository.findById(dto.getParentSubjectId())
+                    .orElseThrow(() -> new IllegalArgumentException("Parent Subject not found id=" + dto.getParentSubjectId())));
+        }
+
+        if (dto.getGradingSchemeId() != null) {
+            entity.setGradingScheme(gradingSchemeRepository.findById(dto.getGradingSchemeId())
+                    .orElseThrow(() -> new IllegalArgumentException("GradingScheme not found id=" + dto.getGradingSchemeId())));
         }
     }
 }

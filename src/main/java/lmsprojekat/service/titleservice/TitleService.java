@@ -7,10 +7,7 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 import jakarta.persistence.EntityNotFoundException;
-import lmsprojekat.dto.titledto.ScientificFieldDTO;
 import lmsprojekat.dto.titledto.TitleDTO;
-import lmsprojekat.dto.titledto.TitleTypeDTO;
-import lmsprojekat.dto.userdto.TeacherDTO;
 import lmsprojekat.model.title.ScientificField;
 import lmsprojekat.model.title.Title;
 import lmsprojekat.model.title.TitleType;
@@ -25,106 +22,86 @@ import lmsprojekat.service.AbstractCrudService;
 @Service
 public class TitleService extends AbstractCrudService<TitleDTO, Title, Long> {
 
-    private final TitleRepository titleRepository;
-    private final TeacherRepository teacherRepository;
-    private final ScientificFieldRepository scientificFieldRepository;
-    private final TitleTypeRepository titleTypeRepository;
+	private final TitleRepository titleRepository;
+	private final TeacherRepository teacherRepository;
+	private final ScientificFieldRepository scientificFieldRepository;
+	private final TitleTypeRepository titleTypeRepository;
 
-    public TitleService(TitleRepository titleRepository,
-                        TeacherRepository teacherRepository,
-                        ScientificFieldRepository scientificFieldRepository,
-                        TitleTypeRepository titleTypeRepository) {
-        this.titleRepository = titleRepository;
-        this.teacherRepository = teacherRepository;
-        this.scientificFieldRepository = scientificFieldRepository;
-        this.titleTypeRepository = titleTypeRepository;
-    }
+	public TitleService(TitleRepository titleRepository, TeacherRepository teacherRepository,
+			ScientificFieldRepository scientificFieldRepository, TitleTypeRepository titleTypeRepository) {
+		this.titleRepository = titleRepository;
+		this.teacherRepository = teacherRepository;
+		this.scientificFieldRepository = scientificFieldRepository;
+		this.titleTypeRepository = titleTypeRepository;
+	}
 
-    @Override
-    protected SoftDeleteRepository<Title, Long> getRepository() {
-        return titleRepository;
-    }
+	@Override
+	protected SoftDeleteRepository<Title, Long> getRepository() {
+		return titleRepository;
+	}
 
-    @Override
-    protected TitleDTO toDTO(Title entity) {
-        Teacher teacher = entity.getTeacher();
-        TeacherDTO teacherDTO = null;
+	@Override
+	protected TitleDTO toDTO(Title entity) {
+		return new TitleDTO(entity.getId(), entity.getSelectionDate(), entity.getEndDate(),
+				entity.getTeacher() != null ? entity.getTeacher().getId() : null,
+				entity.getScientificFields() != null
+						? entity.getScientificFields().stream().map(ScientificField::getId).collect(Collectors.toList())
+						: List.of(),
+				entity.getTitleTypes() != null
+						? entity.getTitleTypes().stream().map(TitleType::getId).collect(Collectors.toList())
+						: List.of());
+	}
 
-        if (teacher != null) {
-            teacherDTO = new TeacherDTO();
-            teacherDTO.setId(teacher.getId());
-            teacherDTO.setName(teacher.getName());
-            teacherDTO.setBiography(teacher.getBiography());
-            teacherDTO.setJmbg(teacher.getJmbg());
-        }
+	@Override
+	protected Title toEntity(TitleDTO dto) {
+		Teacher teacher = null;
+		if (dto.getTeacherId() != null) {
+			teacher = teacherRepository.findById(dto.getTeacherId())
+					.orElseThrow(() -> new EntityNotFoundException("Teacher not found id=" + dto.getTeacherId()));
+		}
 
-        List<ScientificFieldDTO> fieldDTOs = entity.getScientificFields().stream()
-                .map(f -> new ScientificFieldDTO(f.getId(), f.getName(), null))
-                .collect(Collectors.toList());
+		List<ScientificField> fields = Optional.ofNullable(dto.getScientificFieldIds()).orElse(List.of()).stream()
+				.map(id -> scientificFieldRepository.findById(id)
+						.orElseThrow(() -> new EntityNotFoundException("ScientificField not found id=" + id)))
+				.collect(Collectors.toList());
 
-        List<TitleTypeDTO> titleTypeDTOs = entity.getTitleTypes().stream()
-                .map(t -> new TitleTypeDTO(t.getId(), t.getName(), null))
-                .collect(Collectors.toList());
+		List<TitleType> titleTypes = Optional.ofNullable(dto.getTitleTypeIds()).orElse(List.of()).stream()
+				.map(id -> titleTypeRepository.findById(id)
+						.orElseThrow(() -> new EntityNotFoundException("TitleType not found id=" + id)))
+				.collect(Collectors.toList());
 
-        return new TitleDTO(
-                entity.getId(),
-                entity.getSelectionDate(),
-                entity.getEndDate(),
-                teacherDTO,
-                fieldDTOs,
-                titleTypeDTOs
-        );
-    }
+		return new Title(dto.getId(), dto.getSelectionDate(), dto.getEndDate(), teacher, fields, titleTypes);
+	}
 
-    @Override
-    protected Title toEntity(TitleDTO dto) {
-        Teacher teacher = null;
-        if (dto.getTeacher() != null && dto.getTeacher().getId() != null) {
-            teacher = teacherRepository.findById(dto.getTeacher().getId())
-                    .orElseThrow(() -> new EntityNotFoundException("Teacher not found with id: " + dto.getTeacher().getId()));
-        }
+	@Override
+	protected void updateEntity(Title entity, TitleDTO dto) {
+		if (dto.getSelectionDate() != null) {
+			entity.setSelectionDate(dto.getSelectionDate());
+		}
+		if (dto.getEndDate() != null) {
+			entity.setEndDate(dto.getEndDate());
+		}
 
-        List<ScientificField> fields = Optional.ofNullable(dto.getScientificFields()).orElse(List.of()).stream()
-                .map(f -> scientificFieldRepository.findById(f.getId())
-                        .orElseThrow(() -> new EntityNotFoundException("ScientificField not found with id: " + f.getId())))
-                .collect(Collectors.toList());
+		if (dto.getTeacherId() != null) {
+			Teacher teacher = teacherRepository.findById(dto.getTeacherId())
+					.orElseThrow(() -> new EntityNotFoundException("Teacher not found id=" + dto.getTeacherId()));
+			entity.setTeacher(teacher);
+		}
 
-        List<TitleType> titleTypes = Optional.ofNullable(dto.getTitleTypes()).orElse(List.of()).stream()
-                .map(t -> titleTypeRepository.findById(t.getId())
-                        .orElseThrow(() -> new EntityNotFoundException("TitleType not found with id: " + t.getId())))
-                .collect(Collectors.toList());
+		if (dto.getScientificFieldIds() != null) {
+			List<ScientificField> fields = dto.getScientificFieldIds().stream()
+					.map(id -> scientificFieldRepository.findById(id)
+							.orElseThrow(() -> new EntityNotFoundException("ScientificField not found id=" + id)))
+					.collect(Collectors.toList());
+			entity.setScientificFields(fields);
+		}
 
-        return new Title(
-                dto.getId(),
-                dto.getSelectionDate(),
-                dto.getEndDate(),
-                teacher,
-                fields,
-                titleTypes
-        );
-    }
-
-    @Override
-    protected void updateEntity(Title entity, TitleDTO dto) {
-        entity.setSelectionDate(dto.getSelectionDate());
-        entity.setEndDate(dto.getEndDate());
-
-        if (dto.getTeacher() != null && dto.getTeacher().getId() != null) {
-            Teacher teacher = teacherRepository.findById(dto.getTeacher().getId())
-                    .orElseThrow(() -> new EntityNotFoundException("Teacher not found with id: " + dto.getTeacher().getId()));
-            entity.setTeacher(teacher);
-        }
-
-        List<ScientificField> fields = Optional.ofNullable(dto.getScientificFields()).orElse(List.of()).stream()
-                .map(f -> scientificFieldRepository.findById(f.getId())
-                        .orElseThrow(() -> new EntityNotFoundException("ScientificField not found with id: " + f.getId())))
-                .collect(Collectors.toList());
-        entity.setScientificFields(fields);
-
-        List<TitleType> titleTypes = Optional.ofNullable(dto.getTitleTypes()).orElse(List.of()).stream()
-                .map(t -> titleTypeRepository.findById(t.getId())
-                        .orElseThrow(() -> new EntityNotFoundException("TitleType not found with id: " + t.getId())))
-                .collect(Collectors.toList());
-        entity.setTitleTypes(titleTypes);
-    }
+		if (dto.getTitleTypeIds() != null) {
+			List<TitleType> titleTypes = dto.getTitleTypeIds().stream()
+					.map(id -> titleTypeRepository.findById(id)
+							.orElseThrow(() -> new EntityNotFoundException("TitleType not found id=" + id)))
+					.collect(Collectors.toList());
+			entity.setTitleTypes(titleTypes);
+		}
+	}
 }

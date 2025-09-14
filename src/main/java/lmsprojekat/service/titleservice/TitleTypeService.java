@@ -3,7 +3,6 @@ package lmsprojekat.service.titleservice;
 import org.springframework.stereotype.Service;
 
 import jakarta.persistence.EntityNotFoundException;
-import lmsprojekat.dto.titledto.TitleDTO;
 import lmsprojekat.dto.titledto.TitleTypeDTO;
 import lmsprojekat.model.title.Title;
 import lmsprojekat.model.title.TitleType;
@@ -15,64 +14,48 @@ import lmsprojekat.service.AbstractCrudService;
 @Service
 public class TitleTypeService extends AbstractCrudService<TitleTypeDTO, TitleType, Long> {
 
-    private final TitleTypeRepository titleTypeRepository;
-    private final TitleRepository titleRepository;
+	private final TitleTypeRepository titleTypeRepository;
+	private final TitleRepository titleRepository;
 
-    public TitleTypeService(TitleTypeRepository titleTypeRepository, TitleRepository titleRepository) {
-        this.titleTypeRepository = titleTypeRepository;
-        this.titleRepository = titleRepository;
-    }
+	public TitleTypeService(TitleTypeRepository titleTypeRepository, TitleRepository titleRepository) {
+		this.titleTypeRepository = titleTypeRepository;
+		this.titleRepository = titleRepository;
+	}
 
-    @Override
-    protected SoftDeleteRepository<TitleType, Long> getRepository() {
-        return titleTypeRepository;
-    }
+	@Override
+	protected SoftDeleteRepository<TitleType, Long> getRepository() {
+		return titleTypeRepository;
+	}
 
-    @Override
-    protected TitleTypeDTO toDTO(TitleType entity) {
-        Title title = entity.getTitle();
+	@Override
+	protected TitleTypeDTO toDTO(TitleType entity) {
+		return new TitleTypeDTO(entity.getId(), entity.getName(),
+				entity.getTitle() != null ? entity.getTitle().getId() : null);
+	}
 
-        TitleDTO titleDTO = null;
-        if (title != null) {
-            titleDTO = new TitleDTO();
-            titleDTO.setId(title.getId());
-            titleDTO.setSelectionDate(title.getSelectionDate());
-            titleDTO.setEndDate(title.getEndDate());
-        }
+	@Override
+	protected TitleType toEntity(TitleTypeDTO dto) {
+		Title title = null;
+		if (dto.getTitleId() != null) {
+			title = titleRepository.findById(dto.getTitleId())
+					.orElseThrow(() -> new EntityNotFoundException("Title not found with id: " + dto.getTitleId()));
+		}
 
-        return new TitleTypeDTO(
-                entity.getId(),
-                entity.getName(),
-                titleDTO
-        );
-    }
+		return new TitleType(dto.getId(), dto.getName(), title);
+	}
 
-    @Override
-    protected TitleType toEntity(TitleTypeDTO dto) {
-        Title title = null;
+	@Override
+	protected void updateEntity(TitleType entity, TitleTypeDTO dto) {
+		if (dto.getName() != null) {
+			entity.setName(dto.getName());
+		}
 
-        if (dto.getTitle() != null && dto.getTitle().getId() != null) {
-            title = titleRepository.findById(dto.getTitle().getId())
-                    .orElseThrow(() -> new EntityNotFoundException("Title not found with id: " + dto.getTitle().getId()));
-        }
-
-        return new TitleType(
-                dto.getId(),
-                dto.getName(),
-                title
-        );
-    }
-
-    @Override
-    protected void updateEntity(TitleType entity, TitleTypeDTO dto) {
-        entity.setName(dto.getName());
-
-        if (dto.getTitle() != null && dto.getTitle().getId() != null) {
-            Title title = titleRepository.findById(dto.getTitle().getId())
-                    .orElseThrow(() -> new EntityNotFoundException("Title not found with id: " + dto.getTitle().getId()));
-            entity.setTitle(title);
-        } else {
-            entity.setTitle(null);
-        }
-    }
+		if (dto.getTitleId() != null) {
+			Title title = titleRepository.findById(dto.getTitleId())
+					.orElseThrow(() -> new EntityNotFoundException("Title not found with id: " + dto.getTitleId()));
+			entity.setTitle(title);
+		} else {
+			entity.setTitle(null);
+		}
+	}
 }

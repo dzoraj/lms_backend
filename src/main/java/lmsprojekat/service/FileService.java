@@ -5,18 +5,10 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
+import jakarta.persistence.EntityNotFoundException;
 import lmsprojekat.dto.FileDTO;
-import lmsprojekat.dto.MessageDTO;
-import lmsprojekat.dto.NotificationDTO;
-import lmsprojekat.dto.forumdto.PostDTO;
-import lmsprojekat.dto.teachingdto.EvaluationInstrumentDTO;
-import lmsprojekat.dto.teachingdto.TeachingMaterialDTO;
 import lmsprojekat.model.File;
-import lmsprojekat.model.Message;
-import lmsprojekat.model.Notification;
-import lmsprojekat.model.forum.Post;
 import lmsprojekat.model.teaching.EvaluationInstrument;
-import lmsprojekat.model.teaching.TeachingMaterial;
 import lmsprojekat.repository.FileRepository;
 import lmsprojekat.repository.MessageRepository;
 import lmsprojekat.repository.NotificationRepository;
@@ -55,27 +47,17 @@ public class FileService extends AbstractCrudService<FileDTO, File, Long> {
 
     @Override
     protected FileDTO toDTO(File entity) {
-        PostDTO postDTO = entity.getPost() != null ? convertPostToDTO(entity.getPost()) : null;
-        NotificationDTO notificationDTO = entity.getNotification() != null ? convertNotificationToDTO(entity.getNotification()) : null;
-        MessageDTO messageDTO = entity.getMessage() != null ? convertMessageToDTO(entity.getMessage()) : null;
-
-        List<EvaluationInstrumentDTO> evaluationInstrumentDTOs = entity.getEvaluationInstruments() != null ?
-                entity.getEvaluationInstruments().stream()
-                        .map(this::convertEvaluationInstrumentToDTO)
-                        .collect(Collectors.toList()) : null;
-
-        TeachingMaterialDTO teachingMaterialDTO = entity.getTeachingMaterial() != null ?
-                convertTeachingMaterialToDTO(entity.getTeachingMaterial()) : null;
-
         return new FileDTO(
                 entity.getId(),
                 entity.getDescription(),
                 entity.getUrl(),
-                postDTO,
-                notificationDTO,
-                messageDTO,
-                evaluationInstrumentDTOs,
-                teachingMaterialDTO
+                entity.getPost() != null ? entity.getPost().getId() : null,
+                entity.getNotification() != null ? entity.getNotification().getId() : null,
+                entity.getMessage() != null ? entity.getMessage().getId() : null,
+                entity.getEvaluationInstruments() != null
+                        ? entity.getEvaluationInstruments().stream().map(EvaluationInstrument::getId).toList()
+                        : null,
+                entity.getTeachingMaterial() != null ? entity.getTeachingMaterial().getId() : null
         );
     }
 
@@ -86,51 +68,32 @@ public class FileService extends AbstractCrudService<FileDTO, File, Long> {
         entity.setDescription(dto.getDescription());
         entity.setUrl(dto.getUrl());
 
-        if (dto.getPost() != null && dto.getPost().getId() != null) {
-            Post post = postRepository.findById(dto.getPost().getId())
-                    .orElseThrow(() -> new IllegalArgumentException("Post not found with id " + dto.getPost().getId()));
-            entity.setPost(post);
-        } else {
-            entity.setPost(null);
+        if (dto.getPostId() != null) {
+            entity.setPost(postRepository.findById(dto.getPostId())
+                    .orElseThrow(() -> new EntityNotFoundException("Post not found with id " + dto.getPostId())));
         }
 
-        if (dto.getNotification() != null && dto.getNotification().getId() != null) {
-            Notification notification = notificationRepository.findById(dto.getNotification().getId())
-                    .orElseThrow(() -> new IllegalArgumentException("Notification not found with id " + dto.getNotification().getId()));
-            entity.setNotification(notification);
-        } else {
-            entity.setNotification(null);
+        if (dto.getNotificationId() != null) {
+            entity.setNotification(notificationRepository.findById(dto.getNotificationId())
+                    .orElseThrow(() -> new EntityNotFoundException("Notification not found with id " + dto.getNotificationId())));
         }
 
-        if (dto.getMessage() != null && dto.getMessage().getId() != null) {
-            Message message = messageRepository.findById(dto.getMessage().getId())
-                    .orElseThrow(() -> new IllegalArgumentException("Message not found with id " + dto.getMessage().getId()));
-            entity.setMessage(message);
-        } else {
-            entity.setMessage(null);
+        if (dto.getMessageId() != null) {
+            entity.setMessage(messageRepository.findById(dto.getMessageId())
+                    .orElseThrow(() -> new EntityNotFoundException("Message not found with id " + dto.getMessageId())));
         }
 
-        if (dto.getEvaluationInstruments() != null) {
-            List<EvaluationInstrument> evaluationInstruments = dto.getEvaluationInstruments().stream()
-                    .map(eiDto -> {
-                        if (eiDto.getId() == null) {
-                            throw new IllegalArgumentException("EvaluationInstrument id is required");
-                        }
-                        return evaluationInstrumentRepository.findById(eiDto.getId())
-                                .orElseThrow(() -> new IllegalArgumentException("EvaluationInstrument not found with id " + eiDto.getId()));
-                    })
+        if (dto.getEvaluationInstrumentIds() != null) {
+            List<EvaluationInstrument> instruments = dto.getEvaluationInstrumentIds().stream()
+                    .map(id -> evaluationInstrumentRepository.findById(id)
+                            .orElseThrow(() -> new EntityNotFoundException("EvaluationInstrument not found with id " + id)))
                     .collect(Collectors.toList());
-            entity.setEvaluationInstruments(evaluationInstruments);
-        } else {
-            entity.setEvaluationInstruments(null);
+            entity.setEvaluationInstruments(instruments);
         }
 
-        if (dto.getTeachingMaterial() != null && dto.getTeachingMaterial().getId() != null) {
-            TeachingMaterial tm = teachingMaterialRepository.findById(dto.getTeachingMaterial().getId())
-                    .orElseThrow(() -> new IllegalArgumentException("TeachingMaterial not found with id " + dto.getTeachingMaterial().getId()));
-            entity.setTeachingMaterial(tm);
-        } else {
-            entity.setTeachingMaterial(null);
+        if (dto.getTeachingMaterialId() != null) {
+            entity.setTeachingMaterial(teachingMaterialRepository.findById(dto.getTeachingMaterialId())
+                    .orElseThrow(() -> new EntityNotFoundException("TeachingMaterial not found with id " + dto.getTeachingMaterialId())));
         }
 
         return entity;
@@ -141,111 +104,42 @@ public class FileService extends AbstractCrudService<FileDTO, File, Long> {
         entity.setDescription(dto.getDescription());
         entity.setUrl(dto.getUrl());
 
-        // Update post
-        if (dto.getPost() != null && dto.getPost().getId() != null) {
-            Post post = postRepository.findById(dto.getPost().getId())
-                    .orElseThrow(() -> new IllegalArgumentException("Post not found with id " + dto.getPost().getId()));
-            entity.setPost(post);
+        if (dto.getPostId() != null) {
+            entity.setPost(postRepository.findById(dto.getPostId())
+                    .orElseThrow(() -> new EntityNotFoundException("Post not found with id " + dto.getPostId())));
         } else {
             entity.setPost(null);
         }
 
-        // Update notification
-        if (dto.getNotification() != null && dto.getNotification().getId() != null) {
-            Notification notification = notificationRepository.findById(dto.getNotification().getId())
-                    .orElseThrow(() -> new IllegalArgumentException("Notification not found with id " + dto.getNotification().getId()));
-            entity.setNotification(notification);
+        if (dto.getNotificationId() != null) {
+            entity.setNotification(notificationRepository.findById(dto.getNotificationId())
+                    .orElseThrow(() -> new EntityNotFoundException("Notification not found with id " + dto.getNotificationId())));
         } else {
             entity.setNotification(null);
         }
 
-        // Update message
-        if (dto.getMessage() != null && dto.getMessage().getId() != null) {
-            Message message = messageRepository.findById(dto.getMessage().getId())
-                    .orElseThrow(() -> new IllegalArgumentException("Message not found with id " + dto.getMessage().getId()));
-            entity.setMessage(message);
+        if (dto.getMessageId() != null) {
+            entity.setMessage(messageRepository.findById(dto.getMessageId())
+                    .orElseThrow(() -> new EntityNotFoundException("Message not found with id " + dto.getMessageId())));
         } else {
             entity.setMessage(null);
         }
 
-        // Update evaluation instruments
-        if (dto.getEvaluationInstruments() != null) {
-            List<EvaluationInstrument> evaluationInstruments = dto.getEvaluationInstruments().stream()
-                    .map(eiDto -> {
-                        if (eiDto.getId() == null) {
-                            throw new IllegalArgumentException("EvaluationInstrument id is required");
-                        }
-                        return evaluationInstrumentRepository.findById(eiDto.getId())
-                                .orElseThrow(() -> new IllegalArgumentException("EvaluationInstrument not found with id " + eiDto.getId()));
-                    })
+        if (dto.getEvaluationInstrumentIds() != null) {
+            List<EvaluationInstrument> instruments = dto.getEvaluationInstrumentIds().stream()
+                    .map(id -> evaluationInstrumentRepository.findById(id)
+                            .orElseThrow(() -> new EntityNotFoundException("EvaluationInstrument not found with id " + id)))
                     .collect(Collectors.toList());
-            entity.setEvaluationInstruments(evaluationInstruments);
+            entity.setEvaluationInstruments(instruments);
         } else {
             entity.setEvaluationInstruments(null);
         }
 
-        // Update teaching material
-        if (dto.getTeachingMaterial() != null && dto.getTeachingMaterial().getId() != null) {
-            TeachingMaterial tm = teachingMaterialRepository.findById(dto.getTeachingMaterial().getId())
-                    .orElseThrow(() -> new IllegalArgumentException("TeachingMaterial not found with id " + dto.getTeachingMaterial().getId()));
-            entity.setTeachingMaterial(tm);
+        if (dto.getTeachingMaterialId() != null) {
+            entity.setTeachingMaterial(teachingMaterialRepository.findById(dto.getTeachingMaterialId())
+                    .orElseThrow(() -> new EntityNotFoundException("TeachingMaterial not found with id " + dto.getTeachingMaterialId())));
         } else {
             entity.setTeachingMaterial(null);
         }
-    }
-
-    private PostDTO convertPostToDTO(Post post) {
-        return new PostDTO(
-                post.getId(),
-                post.getPostingTime(),
-                post.getContent(),
-                post.getAuthor() != null ? post.getAuthor().getId() : null,
-                post.getTopic() != null ? post.getTopic().getId() : null,
-                post.getAttachments() != null ?
-                        post.getAttachments().stream().map(File::getId).collect(Collectors.toList()) : null
-        );
-    }
-
-    private NotificationDTO convertNotificationToDTO(Notification notification) {
-
-        return new NotificationDTO(
-                notification.getId(),
-                notification.getTitle(),
-                notification.getContent(),
-                notification.getTimePosted(),
-                null, 
-                null, 
-                null 
-        );
-    }
-
-    private MessageDTO convertMessageToDTO(Message message) {
-        return new MessageDTO(
-                message.getId(),
-                message.getDateSent(),
-                message.getContent(),
-                message.getSender() != null ? message.getSender().getId() : null,
-                message.getReceiver() != null ? message.getReceiver().getId() : null,
-                message.getAttachments() != null ? 
-                        message.getAttachments().stream().map(File::getId).collect(Collectors.toList()) : null
-        );
-    }
-
-    private EvaluationInstrumentDTO convertEvaluationInstrumentToDTO(EvaluationInstrument ei) {
-        EvaluationInstrumentDTO dto = new EvaluationInstrumentDTO();
-        dto.setId(ei.getId());
-        dto.setName(ei.getName());
-        return dto;
-    }
-
-    private TeachingMaterialDTO convertTeachingMaterialToDTO(TeachingMaterial tm) {
-        return new TeachingMaterialDTO(
-                tm.getId(),
-                tm.getName(),
-                tm.getAuthors(),
-                tm.getYearOfPublication(),
-                tm.getLearningOutcome() != null ? tm.getLearningOutcome().getId() : null,
-                tm.getFiles() != null ? tm.getFiles().stream().map(File::getId).collect(Collectors.toList()) : null
-        );
     }
 }

@@ -5,8 +5,6 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
-import lmsprojekat.dto.teachingdto.EvaluationInstrumentDTO;
-import lmsprojekat.dto.teachingdto.EvaluationTypeDTO;
 import lmsprojekat.dto.teachingdto.KnowledgeEvaluationDTO;
 import lmsprojekat.model.subject.CourseRealization;
 import lmsprojekat.model.subject.LearningOutcome;
@@ -24,95 +22,116 @@ import lmsprojekat.service.AbstractCrudService;
 @Service
 public class KnowledgeEvaluationService extends AbstractCrudService<KnowledgeEvaluationDTO, KnowledgeEvaluation, Long> {
 
-    private KnowledgeEvaluationRepository knowledgeEvaluationRepository;
+	private final KnowledgeEvaluationRepository knowledgeEvaluationRepository;
+	private final EvaluationInstrumentRepository evaluationInstrumentRepository;
+	private final EvaluationTypeRepository evaluationTypeRepository;
+	private final CourseRealizationRepository courseRealizationRepository;
+	private final LearningOutcomeRepository learningOutcomeRepository;
 
+	public KnowledgeEvaluationService(KnowledgeEvaluationRepository knowledgeEvaluationRepository,
+			EvaluationInstrumentRepository evaluationInstrumentRepository,
+			EvaluationTypeRepository evaluationTypeRepository, CourseRealizationRepository courseRealizationRepository,
+			LearningOutcomeRepository learningOutcomeRepository) {
+		this.knowledgeEvaluationRepository = knowledgeEvaluationRepository;
+		this.evaluationInstrumentRepository = evaluationInstrumentRepository;
+		this.evaluationTypeRepository = evaluationTypeRepository;
+		this.courseRealizationRepository = courseRealizationRepository;
+		this.learningOutcomeRepository = learningOutcomeRepository;
+	}
 
-    private EvaluationInstrumentRepository evaluationInstrumentRepository;
+	@Override
+	protected SoftDeleteRepository<KnowledgeEvaluation, Long> getRepository() {
+		return knowledgeEvaluationRepository;
+	}
 
-    private EvaluationTypeRepository evaluationTypeRepository;
+	@Override
+	public KnowledgeEvaluationDTO toDTO(KnowledgeEvaluation entity) {
+		KnowledgeEvaluationDTO dto = new KnowledgeEvaluationDTO();
+		dto.setId(entity.getId());
+		dto.setStartTime(entity.getStartTime());
+		dto.setEndTime(entity.getEndTime());
+		dto.setPoints(entity.getPoints());
+		dto.setEvaluationInstrumentId(
+				entity.getEvaluationInstrument() != null ? entity.getEvaluationInstrument().getId() : null);
+		dto.setEvaluationTypeId(entity.getEvaluationType() != null ? entity.getEvaluationType().getId() : null);
+		dto.setCourseRealizationId(
+				entity.getCourseRealization() != null ? entity.getCourseRealization().getId() : null);
+		dto.setLearningOutcomeIds(entity.getLearningOutcomes() != null
+				? entity.getLearningOutcomes().stream().map(LearningOutcome::getId).collect(Collectors.toList())
+				: List.of());
+		return dto;
+	}
 
-    private CourseRealizationRepository courseRealizationRepository;
-
-    private LearningOutcomeRepository learningOutcomeRepository;
-
-    @Override
-    protected SoftDeleteRepository<KnowledgeEvaluation, Long> getRepository() {
-        return knowledgeEvaluationRepository;
-    }
-
-    @Override
-    public KnowledgeEvaluationDTO toDTO(KnowledgeEvaluation entity) {
-        return new KnowledgeEvaluationDTO(
-            entity.getId(),
-            entity.getStartTime(),
-            entity.getEndTime(),
-            entity.getPoints(),
-            new EvaluationInstrumentDTO(
-                entity.getEvaluationInstrument().getId(),
-                entity.getEvaluationInstrument().getName(),
-                null,
-                entity.getEvaluationInstrument().getFile()
-            ),
-            new EvaluationTypeDTO(
-                entity.getEvaluationType().getId(),
-                entity.getEvaluationType().getName(),
-                null
-            ),
-            entity.getCourseRealization(),
-            entity.getLearningOutcomes()
-        );
-    }
-
-    @Override
+	@Override
 	public KnowledgeEvaluation toEntity(KnowledgeEvaluationDTO dto) {
-        EvaluationInstrument instrument = evaluationInstrumentRepository.findById(dto.getEvaluationInstrument().getId())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid EvaluationInstrument ID"));
+		KnowledgeEvaluation entity = new KnowledgeEvaluation();
+		entity.setId(dto.getId());
+		entity.setStartTime(dto.getStartTime());
+		entity.setEndTime(dto.getEndTime());
+		entity.setPoints(dto.getPoints());
 
-        EvaluationType type = evaluationTypeRepository.findById(dto.getEvaluationType().getId())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid EvaluationType ID"));
+		if (dto.getEvaluationInstrumentId() != null) {
+			EvaluationInstrument instrument = evaluationInstrumentRepository.findById(dto.getEvaluationInstrumentId())
+					.orElseThrow(() -> new IllegalArgumentException("Invalid EvaluationInstrument ID"));
+			entity.setEvaluationInstrument(instrument);
+		}
 
-        CourseRealization realization = courseRealizationRepository.findById(dto.getCourseRealization().getId())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid CourseRealization ID"));
+		if (dto.getEvaluationTypeId() != null) {
+			EvaluationType type = evaluationTypeRepository.findById(dto.getEvaluationTypeId())
+					.orElseThrow(() -> new IllegalArgumentException("Invalid EvaluationType ID"));
+			entity.setEvaluationType(type);
+		}
 
-        List<LearningOutcome> outcomes = dto.getLearningOutcomes().stream()
-                .map(lo -> learningOutcomeRepository.findById(lo.getId())
-                        .orElseThrow(() -> new IllegalArgumentException("Invalid LearningOutcome ID: " + lo.getId())))
-                .collect(Collectors.toList());
+		if (dto.getCourseRealizationId() != null) {
+			CourseRealization realization = courseRealizationRepository.findById(dto.getCourseRealizationId())
+					.orElseThrow(() -> new IllegalArgumentException("Invalid CourseRealization ID"));
+			entity.setCourseRealization(realization);
+		}
 
-        return new KnowledgeEvaluation(
-                dto.getId(),
-                dto.getStartTime(),
-                dto.getEndTime(),
-                dto.getPoints(),
-                instrument,
-                type,
-                realization,
-                outcomes
-        );
-    }
+		if (dto.getLearningOutcomeIds() != null) {
+			List<LearningOutcome> outcomes = dto.getLearningOutcomeIds().stream()
+					.map(id -> learningOutcomeRepository.findById(id)
+							.orElseThrow(() -> new IllegalArgumentException("Invalid LearningOutcome ID: " + id)))
+					.collect(Collectors.toList());
+			entity.setLearningOutcomes(outcomes);
+		}
 
-    @Override
-    protected void updateEntity(KnowledgeEvaluation entity, KnowledgeEvaluationDTO dto) {
-        entity.setStartTime(dto.getStartTime());
-        entity.setEndTime(dto.getEndTime());
-        entity.setPoints(dto.getPoints());
+		return entity;
+	}
 
-        EvaluationInstrument instrument = evaluationInstrumentRepository.findById(dto.getEvaluationInstrument().getId())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid EvaluationInstrument ID"));
-        entity.setEvaluationInstrument(instrument);
+	@Override
+	protected void updateEntity(KnowledgeEvaluation entity, KnowledgeEvaluationDTO dto) {
+		if (dto.getStartTime() != null)
+			entity.setStartTime(dto.getStartTime());
+		if (dto.getEndTime() != null)
+			entity.setEndTime(dto.getEndTime());
+		if (dto.getPoints() != null)
+			entity.setPoints(dto.getPoints());
 
-        EvaluationType type = evaluationTypeRepository.findById(dto.getEvaluationType().getId())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid EvaluationType ID"));
-        entity.setEvaluationType(type);
+		if (dto.getEvaluationInstrumentId() != null) {
+			EvaluationInstrument instrument = evaluationInstrumentRepository.findById(dto.getEvaluationInstrumentId())
+					.orElseThrow(() -> new IllegalArgumentException("Invalid EvaluationInstrument ID"));
+			entity.setEvaluationInstrument(instrument);
+		}
 
-        CourseRealization realization = courseRealizationRepository.findById(dto.getCourseRealization().getId())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid CourseRealization ID"));
-        entity.setCourseRealization(realization);
+		if (dto.getEvaluationTypeId() != null) {
+			EvaluationType type = evaluationTypeRepository.findById(dto.getEvaluationTypeId())
+					.orElseThrow(() -> new IllegalArgumentException("Invalid EvaluationType ID"));
+			entity.setEvaluationType(type);
+		}
 
-        List<LearningOutcome> outcomes = dto.getLearningOutcomes().stream()
-                .map(lo -> learningOutcomeRepository.findById(lo.getId())
-                        .orElseThrow(() -> new IllegalArgumentException("Invalid LearningOutcome ID: " + lo.getId())))
-                .collect(Collectors.toList());
-        entity.setLearningOutcomes(outcomes);
-    }
+		if (dto.getCourseRealizationId() != null) {
+			CourseRealization realization = courseRealizationRepository.findById(dto.getCourseRealizationId())
+					.orElseThrow(() -> new IllegalArgumentException("Invalid CourseRealization ID"));
+			entity.setCourseRealization(realization);
+		}
+
+		if (dto.getLearningOutcomeIds() != null) {
+			List<LearningOutcome> outcomes = dto.getLearningOutcomeIds().stream()
+					.map(id -> learningOutcomeRepository.findById(id)
+							.orElseThrow(() -> new IllegalArgumentException("Invalid LearningOutcome ID: " + id)))
+					.collect(Collectors.toList());
+			entity.setLearningOutcomes(outcomes);
+		}
+	}
 }

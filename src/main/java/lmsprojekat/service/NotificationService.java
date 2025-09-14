@@ -8,10 +8,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import jakarta.persistence.EntityNotFoundException;
-import lmsprojekat.dto.FileDTO;
 import lmsprojekat.dto.NotificationDTO;
-import lmsprojekat.dto.subjectdto.CourseRealizationDTO;
-import lmsprojekat.dto.teachingdto.TeacherOnCourseDTO;
 import lmsprojekat.model.File;
 import lmsprojekat.model.Notification;
 import lmsprojekat.model.subject.CourseRealization;
@@ -47,39 +44,54 @@ public class NotificationService extends AbstractCrudService<NotificationDTO, No
     }
 
     @Override
-    public NotificationDTO toDTO(Notification notification) {
+    public NotificationDTO toDTO(Notification entity) {
         return new NotificationDTO(
-                notification.getId(),
-                notification.getTitle(),
-                notification.getContent(),
-                notification.getTimePosted(),
-                toCourseRealizationDTO(notification.getCourseRealization()),
-                toTeacherOnCourseDTO(notification.getTeacherOnCourse()),
-                (notification.getAttachments() != null
-                    ? notification.getAttachments().stream().map(this::toFileDTO).toList()
-                    : List.of())
+                entity.getId(),
+                entity.getTitle(),
+                entity.getContent(),
+                entity.getTimePosted(),
+                entity.getCourseRealization() != null ? entity.getCourseRealization().getId() : null,
+                entity.getTeacherOnCourse() != null ? entity.getTeacherOnCourse().getId() : null,
+                entity.getAttachments() != null
+                        ? entity.getAttachments().stream().map(File::getId).collect(Collectors.toList())
+                        : List.of()
         );
     }
 
-
     @Override
     public Notification toEntity(NotificationDTO dto) {
-        Notification notification = new Notification();
-        notification.setId(dto.getId());
-        notification.setTitle(dto.getTitle());
-        notification.setContent(dto.getContent());
-        notification.setTimePosted(LocalDateTime.now());
-        notification.setCourseRealization(fetchCourseRealization(dto.getCourseRealization().getId()));
-        notification.setTeacherOnCourse(fetchTeacherOnCourse(dto.getTeacherOnCourse().getId()));
-        return notification;
+        Notification entity = new Notification();
+        entity.setId(dto.getId());
+        entity.setTitle(dto.getTitle());
+        entity.setContent(dto.getContent());
+        entity.setTimePosted(LocalDateTime.now());
+
+        if (dto.getCourseRealizationId() != null) {
+            entity.setCourseRealization(fetchCourseRealization(dto.getCourseRealizationId()));
+        }
+        if (dto.getTeacherOnCourseId() != null) {
+            entity.setTeacherOnCourse(fetchTeacherOnCourse(dto.getTeacherOnCourseId()));
+        }
+
+        return entity;
     }
 
     @Override
     protected void updateEntity(Notification entity, NotificationDTO dto) {
         entity.setTitle(dto.getTitle());
         entity.setContent(dto.getContent());
-        entity.setCourseRealization(fetchCourseRealization(dto.getCourseRealization().getId()));
-        entity.setTeacherOnCourse(fetchTeacherOnCourse(dto.getTeacherOnCourse().getId()));
+
+        if (dto.getCourseRealizationId() != null) {
+            entity.setCourseRealization(fetchCourseRealization(dto.getCourseRealizationId()));
+        } else {
+            entity.setCourseRealization(null);
+        }
+
+        if (dto.getTeacherOnCourseId() != null) {
+            entity.setTeacherOnCourse(fetchTeacherOnCourse(dto.getTeacherOnCourseId()));
+        } else {
+            entity.setTeacherOnCourse(null);
+        }
     }
 
     @Override
@@ -93,16 +105,16 @@ public class NotificationService extends AbstractCrudService<NotificationDTO, No
 
     public List<NotificationDTO> getNotificationsForCourse(Long courseId) {
         return notificationRepository.findByCourseRealizationId(courseId)
-                .stream().map(this::toDTO).collect(Collectors.toList());
+                .stream().map(this::toDTO).toList();
     }
 
     public List<NotificationDTO> getNotificationsForStudent(Long studentId) {
         return notificationRepository.findByStudentId(studentId)
-                .stream().map(this::toDTO).collect(Collectors.toList());
+                .stream().map(this::toDTO).toList();
     }
 
     public List<NotificationDTO> getNotificationsForTeacher(Long teacherId) {
-        return notificationRepository.findAll() 
+        return notificationRepository.findAll()
                 .stream()
                 .filter(n -> n.getTeacherOnCourse() != null &&
                              n.getTeacherOnCourse().getTeacher().getId().equals(teacherId))
@@ -111,17 +123,14 @@ public class NotificationService extends AbstractCrudService<NotificationDTO, No
     }
 
     public NotificationDTO createForTeacher(Long teacherId, NotificationDTO dto) {
-        if (!teacherOnCourseRepository.existsById(dto.getTeacherOnCourse().getId())) {
+        if (!teacherOnCourseRepository.existsById(dto.getTeacherOnCourseId())) {
             throw new SecurityException("Teacher is not assigned to this course.");
         }
-
         Notification entity = toEntity(dto);
         entity.setTimePosted(LocalDateTime.now());
         entity = notificationRepository.save(entity);
-
         NotificationDTO savedDto = toDTO(entity);
         messagingTemplate.convertAndSend("/topic/notifications", savedDto);
-
         return savedDto;
     }
 
@@ -129,43 +138,17 @@ public class NotificationService extends AbstractCrudService<NotificationDTO, No
         if (!teacherOnCourseRepository.existsByTeacherAndSubject(teacherId, subjectId)) {
             throw new SecurityException("Teacher is not assigned to this subject.");
         }
-
         Notification entity = toEntity(dto);
         entity.setTimePosted(LocalDateTime.now());
         entity = notificationRepository.save(entity);
-
         NotificationDTO savedDto = toDTO(entity);
         messagingTemplate.convertAndSend("/topic/notifications", savedDto);
-
         return savedDto;
     }
 
     public List<NotificationDTO> getNotificationsForTeacherAndSubject(Long teacherId, Long subjectId) {
         return notificationRepository.findByTeacherIdAndSubjectId(teacherId, subjectId)
-                .stream()
-                .map(this::toDTO)
-                .toList();
-    }
-
-
-    private CourseRealizationDTO toCourseRealizationDTO(CourseRealization cr) {
-        CourseRealizationDTO dto = new CourseRealizationDTO();
-        dto.setId(cr.getId());
-        return dto;
-    }
-
-    private TeacherOnCourseDTO toTeacherOnCourseDTO(TeacherOnCourse toc) {
-        TeacherOnCourseDTO dto = new TeacherOnCourseDTO();
-        dto.setId(toc.getId());
-        return dto;
-    }
-
-    private FileDTO toFileDTO(File file) {
-        FileDTO dto = new FileDTO();
-        dto.setId(file.getId());
-        dto.setDescription(file.getDescription());
-        dto.setUrl(file.getUrl());
-        return dto;
+                .stream().map(this::toDTO).toList();
     }
 
     private CourseRealization fetchCourseRealization(Long id) {

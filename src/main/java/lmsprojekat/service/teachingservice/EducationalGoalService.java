@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.persistence.EntityNotFoundException;
-import lmsprojekat.dto.subjectdto.LearningOutcomeDTO;
 import lmsprojekat.dto.teachingdto.EducationalGoalDTO;
 import lmsprojekat.model.subject.LearningOutcome;
 import lmsprojekat.model.teaching.EducationalGoal;
@@ -23,7 +22,7 @@ public class EducationalGoalService extends AbstractCrudService<EducationalGoalD
     private final LearningOutcomeRepository learningOutcomeRepository;
 
     public EducationalGoalService(EducationalGoalRepository educationalGoalRepository,
-                                 LearningOutcomeRepository learningOutcomeRepository) {
+                                  LearningOutcomeRepository learningOutcomeRepository) {
         this.educationalGoalRepository = educationalGoalRepository;
         this.learningOutcomeRepository = learningOutcomeRepository;
     }
@@ -37,29 +36,13 @@ public class EducationalGoalService extends AbstractCrudService<EducationalGoalD
     protected EducationalGoalDTO toDTO(EducationalGoal entity) {
         if (entity == null) return null;
 
-        EducationalGoalDTO dto = new EducationalGoalDTO();
-        dto.setId(entity.getId());
-        dto.setDescription(entity.getDescription());
-
-        if (entity.getLearningOutcomes() != null) {
-            List<LearningOutcomeDTO> learningOutcomeDTOs = entity.getLearningOutcomes().stream()
-                .map(lo -> {
-                    LearningOutcomeDTO loDto = new LearningOutcomeDTO();
-                    loDto.setId(lo.getId());
-                    loDto.setDescription(lo.getDescription());
-                    loDto.setSubject(null); 
-                    loDto.setEducationalGoals(null);
-                    loDto.setTeachingMaterials(null);
-                    loDto.setKnowledgeEvaluations(null);
-                    loDto.setTeachingSessions(null);
-                    return loDto;
-                }).toList();
-            dto.setLearningOutcomes(learningOutcomeDTOs);
-        } else {
-            dto.setLearningOutcomes(List.of());
-        }
-
-        return dto;
+        return new EducationalGoalDTO(
+            entity.getId(),
+            entity.getDescription(),
+            entity.getLearningOutcomes() != null
+                ? entity.getLearningOutcomes().stream().map(LearningOutcome::getId).toList()
+                : List.of()
+        );
     }
 
     @Override
@@ -70,16 +53,12 @@ public class EducationalGoalService extends AbstractCrudService<EducationalGoalD
         entity.setId(dto.getId());
         entity.setDescription(dto.getDescription());
 
-        if (dto.getLearningOutcomes() != null) {
-            List<LearningOutcome> learningOutcomes = dto.getLearningOutcomes().stream()
-                .map(loDto -> {
-                    if (loDto.getId() == null) {
-                        throw new IllegalArgumentException("LearningOutcome id is required");
-                    }
-                    return learningOutcomeRepository.findById(loDto.getId())
-                        .orElseThrow(() -> new EntityNotFoundException("LearningOutcome not found, id=" + loDto.getId()));
-                }).toList();
-            entity.setLearningOutcomes(learningOutcomes);
+        if (dto.getLearningOutcomeIds() != null) {
+            List<LearningOutcome> outcomes = dto.getLearningOutcomeIds().stream()
+                .map(id -> learningOutcomeRepository.findById(id)
+                        .orElseThrow(() -> new EntityNotFoundException("LearningOutcome not found, id=" + id)))
+                .toList();
+            entity.setLearningOutcomes(outcomes);
         } else {
             entity.setLearningOutcomes(List.of());
         }
@@ -91,16 +70,12 @@ public class EducationalGoalService extends AbstractCrudService<EducationalGoalD
     protected void updateEntity(EducationalGoal entity, EducationalGoalDTO dto) {
         entity.setDescription(dto.getDescription());
 
-        if (dto.getLearningOutcomes() != null) {
-            List<LearningOutcome> learningOutcomes = dto.getLearningOutcomes().stream()
-                .map(loDto -> {
-                    if (loDto.getId() == null) {
-                        throw new IllegalArgumentException("LearningOutcome id is required");
-                    }
-                    return learningOutcomeRepository.findById(loDto.getId())
-                        .orElseThrow(() -> new EntityNotFoundException("LearningOutcome not found, id=" + loDto.getId()));
-                }).toList();
-            entity.setLearningOutcomes(learningOutcomes);
+        if (dto.getLearningOutcomeIds() != null) {
+            List<LearningOutcome> outcomes = dto.getLearningOutcomeIds().stream()
+                .map(id -> learningOutcomeRepository.findById(id)
+                        .orElseThrow(() -> new EntityNotFoundException("LearningOutcome not found, id=" + id)))
+                .toList();
+            entity.setLearningOutcomes(outcomes);
         } else {
             entity.setLearningOutcomes(List.of());
         }

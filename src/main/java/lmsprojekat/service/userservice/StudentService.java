@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.OptionalDouble;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
@@ -30,12 +29,10 @@ public class StudentService extends AbstractCrudService<StudentDTO, Student, Lon
     private final StudentInYearService studentInYearService;
     private final EvaluationAttemptRepository evaluationAttemptRepository;
 
-    public StudentService(
-            StudentRepository studentRepository,
-            CourseAttendanceService courseAttendanceService,
-            StudentInYearService studentInYearService,
-            EvaluationAttemptRepository evaluationAttemptRepository
-    ) {
+    public StudentService(StudentRepository studentRepository,
+                          CourseAttendanceService courseAttendanceService,
+                          StudentInYearService studentInYearService,
+                          EvaluationAttemptRepository evaluationAttemptRepository) {
         this.studentRepository = studentRepository;
         this.courseAttendanceService = courseAttendanceService;
         this.studentInYearService = studentInYearService;
@@ -54,14 +51,14 @@ public class StudentService extends AbstractCrudService<StudentDTO, Student, Lon
                 .stream()
                 .filter(Objects::nonNull)
                 .map(ca -> ca.getId())
-                .collect(Collectors.toList());
+                .toList();
 
         List<Long> studentInYearIds = Optional.ofNullable(student.getStudentInYear())
                 .orElse(List.of())
                 .stream()
                 .filter(Objects::nonNull)
                 .map(siy -> siy.getId())
-                .collect(Collectors.toList());
+                .toList();
 
         Long addressId = student.getAddress() != null ? student.getAddress().getId() : null;
 
@@ -69,7 +66,7 @@ public class StudentService extends AbstractCrudService<StudentDTO, Student, Lon
                 .orElse(List.of())
                 .stream()
                 .map(r -> r.getName())
-                .collect(Collectors.toList());
+                .toList();
 
         return new StudentDTO(
                 student.getId(),
@@ -97,9 +94,6 @@ public class StudentService extends AbstractCrudService<StudentDTO, Student, Lon
             address.setId(dto.getAddressId());
             student.setAddress(address);
         }
-
-        student.setCourseAttendances(null);
-        student.setStudentInYear(null);
 
         return student;
     }
@@ -131,73 +125,62 @@ public class StudentService extends AbstractCrudService<StudentDTO, Student, Lon
 
         List<CourseAttendanceDTO> currentCourses = allAttendances.stream()
                 .filter(ca -> ca != null && ca.getKonacnaOcena() == null)
-                .collect(Collectors.toList());
+                .toList();
 
         List<StudentInYearDTO> studyHistory = Optional.ofNullable(student.getStudentInYear())
                 .orElse(List.of())
                 .stream()
                 .filter(Objects::nonNull)
                 .map(siy -> studentInYearService.findById(siy.getId()))
-                .collect(Collectors.toList());
+                .toList();
 
-        Map<Long, List<CourseAttendanceDTO>> bySubject = allAttendances.stream()
-                .filter(ca -> ca != null
-                        && ca.getCourseRealization() != null
-                        && ca.getCourseRealization().getSubject() != null
-                        && ca.getCourseRealization().getSubject().getId() != null)
-                .collect(Collectors.groupingBy(ca -> ca.getCourseRealization().getSubject().getId()));
+        Map<Long, List<CourseAttendanceDTO>> byCourseRealization = allAttendances.stream()
+                .filter(Objects::nonNull)
+                .collect(Collectors.groupingBy(CourseAttendanceDTO::getCourseRealizationId));
 
-        List<SubjectStudySummaryDTO> studyHistoryCourses = bySubject.entrySet().stream()
+        List<SubjectStudySummaryDTO> studyHistoryCourses = byCourseRealization.entrySet().stream()
                 .map(e -> {
-                    Long subjectId = e.getKey();
+                    Long courseRealizationId = e.getKey();
                     List<CourseAttendanceDTO> list = e.getValue();
-
-                    CourseAttendanceDTO exemplar = list.stream()
-                            .filter(ca -> ca.getCourseRealization() != null && ca.getCourseRealization().getSubject() != null)
-                            .findFirst().orElse(null);
-
-                    String name = exemplar != null && exemplar.getCourseRealization().getSubject() != null
-                            ? exemplar.getCourseRealization().getSubject().getName()
-                            : null;
-                    Integer espb = exemplar != null && exemplar.getCourseRealization().getSubject() != null
-                            ? exemplar.getCourseRealization().getSubject().getEspb()
-                            : null;
 
                     int attempts = list.size();
 
                     Integer finalGrade = list.stream()
                             .map(CourseAttendanceDTO::getKonacnaOcena)
                             .filter(Objects::nonNull)
-                            .reduce((first, second) -> second) // last grade
+                            .reduce((first, second) -> second)
                             .orElse(null);
 
+
+                    String subjectName = null;
+                    Integer espb = null;
+
                     Integer finalPoints = evaluationAttemptRepository
-                            .findPointsByStudentAndSubject(studentId, subjectId)
+                            .findPointsByStudentAndSubject(studentId, courseRealizationId)
                             .stream()
                             .findFirst()
                             .orElse(null);
 
-                    return new SubjectStudySummaryDTO(subjectId, name, espb, attempts, finalPoints, finalGrade);
+                    return new SubjectStudySummaryDTO(courseRealizationId, subjectName, espb, attempts, finalPoints, finalGrade);
                 })
-                .collect(Collectors.toList());
+                .toList();
 
         int totalEspb = studyHistoryCourses.stream()
                 .filter(s -> s.getFinalGrade() != null && s.getEspb() != null)
                 .mapToInt(SubjectStudySummaryDTO::getEspb)
                 .sum();
 
-        OptionalDouble optAvg = studyHistoryCourses.stream()
+        Double averageGrade = studyHistoryCourses.stream()
                 .filter(s -> s.getFinalGrade() != null)
-                .mapToDouble(SubjectStudySummaryDTO::getFinalGrade)
-                .average();
-
-        Double averageGrade = optAvg.isPresent() ? optAvg.getAsDouble() : null;
+                .mapToInt(SubjectStudySummaryDTO::getFinalGrade)
+                .average()
+                .orElse(Double.NaN);
 
         StudentDashboardDTO dashboard = new StudentDashboardDTO();
         dashboard.setCurrentCourses(currentCourses);
         dashboard.setStudyHistory(studyHistory);
         dashboard.setStudyHistoryCourses(studyHistoryCourses);
-        dashboard.setAverageGrade(averageGrade);
+        dashboard.setAverageGrade(Double.isNaN(averageGrade) ? null : averageGrade);
         dashboard.setTotalEspb(totalEspb);
 
         return dashboard;

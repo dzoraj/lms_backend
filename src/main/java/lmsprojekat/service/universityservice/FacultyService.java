@@ -1,108 +1,99 @@
 package lmsprojekat.service.universityservice;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
+
 import jakarta.persistence.EntityNotFoundException;
 import lmsprojekat.dto.universitydto.FacultyDTO;
+import lmsprojekat.model.Address;
 import lmsprojekat.model.university.Faculty;
 import lmsprojekat.model.university.University;
 import lmsprojekat.model.users.Teacher;
+import lmsprojekat.repository.AddressRepository;
 import lmsprojekat.repository.SoftDeleteRepository;
 import lmsprojekat.repository.universityrepo.FacultyRepository;
 import lmsprojekat.repository.universityrepo.UniversityRepository;
 import lmsprojekat.repository.userrepo.TeacherRepository;
 import lmsprojekat.service.AbstractCrudService;
-import lmsprojekat.service.AddressService;
 
 @Service
 public class FacultyService extends AbstractCrudService<FacultyDTO, Faculty, Long> {
 
-    private final FacultyRepository facultyRepository;
-    private final TeacherRepository teacherRepository;
-    private final UniversityRepository universityRepository;
-    private final AddressService addressService;
+	private final FacultyRepository facultyRepository;
+	private final TeacherRepository teacherRepository;
+	private final UniversityRepository universityRepository;
+	private final AddressRepository addressRepository;
 
-    public FacultyService(FacultyRepository facultyRepository,
-                          TeacherRepository teacherRepository,
-                          UniversityRepository universityRepository,
-                          AddressService addressService) {
-        this.facultyRepository = facultyRepository;
-        this.teacherRepository = teacherRepository;
-        this.universityRepository = universityRepository;
-        this.addressService = addressService;
-    }
+	public FacultyService(FacultyRepository facultyRepository, TeacherRepository teacherRepository,
+			UniversityRepository universityRepository, AddressRepository addressRepository) {
+		this.facultyRepository = facultyRepository;
+		this.teacherRepository = teacherRepository;
+		this.universityRepository = universityRepository;
+		this.addressRepository = addressRepository;
+	}
 
-    @Override
-    protected SoftDeleteRepository<Faculty, Long> getRepository() {
-        return facultyRepository;
-    }
+	@Override
+	protected SoftDeleteRepository<Faculty, Long> getRepository() {
+		return facultyRepository;
+	}
 
+	@Override
+	public FacultyDTO toDTO(Faculty entity) {
+		Long deanId = entity.getDean() != null ? entity.getDean().getId() : null;
+		Long universityId = entity.getUniversity() != null ? entity.getUniversity().getId() : null;
+		List<Long> addressIds = entity.getAddresses() != null
+				? entity.getAddresses().stream().map(Address::getId).toList()
+				: List.of();
 
-    @Override
-    public FacultyDTO toDTO(Faculty entity) {
-        Long deanId = entity.getDean() != null ? entity.getDean().getId() : null;
-        Long universityId = entity.getUniversity() != null ? entity.getUniversity().getId() : null;
+		return new FacultyDTO(entity.getId(), entity.getName(), deanId, universityId, addressIds);
+	}
 
-        return new FacultyDTO(
-            entity.getId(),
-            entity.getName(),
-            deanId,
-            universityId,
-            entity.getAddresses() != null
-                ? entity.getAddresses().stream()
-                    .map(addressService::toDTO)
-                    .toList()
-                : null
-        );
-    }
+	@Override
+	public Faculty toEntity(FacultyDTO dto) {
+		if (dto.getDeanId() == null) {
+			throw new IllegalArgumentException("Faculty must have a dean id");
+		}
 
-    @Override
-    public Faculty toEntity(FacultyDTO dto) {
-        if (dto.getDean() == null) {
-            throw new IllegalArgumentException("Faculty must have a dean id");
-        }
+		Teacher dean = teacherRepository.findById(dto.getDeanId())
+				.orElseThrow(() -> new EntityNotFoundException("Dean not found with id: " + dto.getDeanId()));
 
-        Teacher dean = teacherRepository.findById(dto.getDean())
-                .orElseThrow(() -> new EntityNotFoundException("Dean not found with id: " + dto.getDean()));
+		University university = null;
+		if (dto.getUniversityId() != null) {
+			university = universityRepository.findById(dto.getUniversityId()).orElseThrow(
+					() -> new EntityNotFoundException("University not found with id: " + dto.getUniversityId()));
+		}
 
-        University university = null;
-        if (dto.getUniversity() != null) {
-            university = universityRepository.findById(dto.getUniversity())
-                    .orElseThrow(() -> new EntityNotFoundException("University not found with id: " + dto.getUniversity()));
-        }
+		List<Address> addresses = dto.getAddressIds() != null ? dto.getAddressIds().stream()
+				.map(id -> addressRepository.findById(id)
+						.orElseThrow(() -> new EntityNotFoundException("Address not found with id: " + id)))
+				.toList() : List.of();
 
-        return new Faculty(
-            dto.getId(),
-            dto.getName(),
-            dean,
-            university,
-            dto.getAddresses() != null
-                ? dto.getAddresses().stream()
-                    .map(addressService::toEntity)
-                    .toList()
-                : null
-        );
-    }
+		return new Faculty(dto.getId(), dto.getName(), dean, university, addresses);
+	}
 
-    @Override
-    protected void updateEntity(Faculty entity, FacultyDTO dto) {
-        entity.setName(dto.getName());
+	@Override
+	protected void updateEntity(Faculty entity, FacultyDTO dto) {
+		entity.setName(dto.getName());
 
-        if (dto.getDean() != null) {
-            Teacher dean = teacherRepository.findById(dto.getDean())
-                    .orElseThrow(() -> new EntityNotFoundException("Dean not found with id: " + dto.getDean()));
-            entity.setDean(dean);
-        }
+		if (dto.getDeanId() != null) {
+			Teacher dean = teacherRepository.findById(dto.getDeanId())
+					.orElseThrow(() -> new EntityNotFoundException("Dean not found with id: " + dto.getDeanId()));
+			entity.setDean(dean);
+		}
 
-        if (dto.getUniversity() != null) {
-            University university = universityRepository.findById(dto.getUniversity())
-                    .orElseThrow(() -> new EntityNotFoundException("University not found with id: " + dto.getUniversity()));
-            entity.setUniversity(university);
-        }
+		if (dto.getUniversityId() != null) {
+			University university = universityRepository.findById(dto.getUniversityId()).orElseThrow(
+					() -> new EntityNotFoundException("University not found with id: " + dto.getUniversityId()));
+			entity.setUniversity(university);
+		}
 
-        if (dto.getAddresses() != null) {
-            entity.setAddresses(dto.getAddresses().stream()
-                .map(addressService::toEntity)
-                .toList());
-        }
-    }
+		if (dto.getAddressIds() != null) {
+			List<Address> addresses = dto.getAddressIds().stream()
+					.map(id -> addressRepository.findById(id)
+							.orElseThrow(() -> new EntityNotFoundException("Address not found with id: " + id)))
+					.toList();
+			entity.setAddresses(addresses);
+		}
+	}
 }

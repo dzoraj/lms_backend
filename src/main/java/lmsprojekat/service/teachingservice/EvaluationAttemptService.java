@@ -1,6 +1,7 @@
 package lmsprojekat.service.teachingservice;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -8,13 +9,17 @@ import org.springframework.transaction.annotation.Transactional;
 
 import jakarta.persistence.EntityNotFoundException;
 import lmsprojekat.dto.teachingdto.EvaluationAttemptDTO;
+import lmsprojekat.model.grading.GradeBoundary;
+import lmsprojekat.model.grading.GradingScheme;
 import lmsprojekat.model.student.StudentInYear;
 import lmsprojekat.model.subject.CourseAttendance;
+import lmsprojekat.model.subject.Subject;
 import lmsprojekat.model.teaching.EvaluationAttempt;
 import lmsprojekat.model.teaching.ExamApplication;
 import lmsprojekat.model.teaching.KnowledgeEvaluation;
 import lmsprojekat.repository.studentrepo.StudentInYearRepository;
 import lmsprojekat.repository.subjectrepo.CourseAttendanceRepository;
+import lmsprojekat.repository.subjectrepo.SubjectRepository;
 import lmsprojekat.repository.teachingrepo.EvaluationAttemptRepository;
 import lmsprojekat.repository.teachingrepo.ExamApplicationRepository;
 import lmsprojekat.repository.teachingrepo.KnowledgeEvaluationRepository;
@@ -28,19 +33,22 @@ public class EvaluationAttemptService extends AbstractCrudService<EvaluationAtte
     private final StudentInYearRepository studentInYearRepository;
     private final ExamApplicationRepository examApplicationRepository;
     private final CourseAttendanceRepository courseAttendanceRepository;
+    private final SubjectRepository subjectRepository;
 
     public EvaluationAttemptService(
             EvaluationAttemptRepository evaluationAttemptRepository,
             KnowledgeEvaluationRepository knowledgeEvaluationRepository,
             StudentInYearRepository studentInYearRepository,
             ExamApplicationRepository examApplicationRepository,
-            CourseAttendanceRepository courseAttendanceRepository
+            CourseAttendanceRepository courseAttendanceRepository,
+            SubjectRepository subjectRepository
     ) {
         this.evaluationAttemptRepository = evaluationAttemptRepository;
         this.knowledgeEvaluationRepository = knowledgeEvaluationRepository;
         this.studentInYearRepository = studentInYearRepository;
         this.examApplicationRepository = examApplicationRepository;
         this.courseAttendanceRepository = courseAttendanceRepository;
+        this.subjectRepository = subjectRepository;
     }
 
     @Override
@@ -131,34 +139,53 @@ public class EvaluationAttemptService extends AbstractCrudService<EvaluationAtte
         attempt.setNote(note);
         evaluationAttemptRepository.save(attempt);
 
-        updateFinalSubjectGrade(application.getStudentInYear().getStudent().getId(),
-                                exam.getCourseRealization().getSubject().getId());
+        updateFinalSubjectGrade(
+                application.getStudentInYear().getStudent().getId(),
+                exam.getCourseRealization().getSubject().getId()
+        );
 
         return toDTO(attempt);
     }
 
     private void updateFinalSubjectGrade(Long studentId, Long subjectId) {
         List<Integer> points = evaluationAttemptRepository.findPointsByStudentAndSubject(studentId, subjectId);
-
         if (points.isEmpty()) return;
 
-        List<Integer> lastThree = points.stream().limit(3).toList();
+        int totalPoints = points.stream().mapToInt(Integer::intValue).sum();
 
-        double avgPoints = lastThree.stream().mapToInt(Integer::intValue).average().orElse(0);
+        Subject subject = subjectRepository.findById(subjectId)
+                .orElseThrow(() -> new EntityNotFoundException("Subject not found id=" + subjectId));
 
-        int grade;
-        if (avgPoints >= 90) grade = 10;
-        else if (avgPoints >= 80) grade = 9;
-        else if (avgPoints >= 70) grade = 8;
-        else if (avgPoints >= 60) grade = 7;
-        else if (avgPoints >= 51) grade = 6;
-        else grade = 5;
+        GradingScheme scheme = subject.getGradingScheme();
+        if (scheme == null) {
+            throw new IllegalStateException("No grading scheme defined for subject " + subjectId);
+        }
 
+        if (scheme.getThreshold() != null && totalPoints < scheme.getThreshold()) {
+            setFinalGrade(studentId, subjectId, 5); // Fail
+            return;
+        }
+
+        List<GradeBoundary> boundaries = scheme.getGradeBoundaries().stream()
+                .sorted(Comparator.comparingInt(GradeBoundary::getMinPoints))
+                .toList();
+
+        int grade = 5; 
+        for (GradeBoundary boundary : boundaries) {
+            if (totalPoints >= boundary.getMinPoints()) {
+                grade = boundary.getGradeValue();
+            }
+        }
+
+        setFinalGrade(studentId, subjectId, grade);
+    }
+
+
+    private void setFinalGrade(Long studentId, Long subjectId, int grade) {
         CourseAttendance ca = courseAttendanceRepository.findByStudentAndSubject(studentId, subjectId);
         if (ca != null) {
             ca.setKonacnaOcena(grade);
             courseAttendanceRepository.save(ca);
         }
     }
-
 }
