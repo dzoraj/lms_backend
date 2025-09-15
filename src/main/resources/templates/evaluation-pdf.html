@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <style>
+    body { font-family: DejaVu Sans, Arial, sans-serif; font-size: 12px; }
+    h1,h2 { margin: 0 0 8px 0; }
+    .meta { margin-bottom: 12px; }
+    .meta span { display:inline-block; margin-right:10px; }
+    table { width:100%; border-collapse: collapse; }
+    th, td { border:1px solid #888; padding:6px; vertical-align: top; }
+    th { background:#f2f2f2; text-align: left; }
+    .small { color:#555; font-size: 11px; }
+  </style>
+  <title>Evaluation Export</title>
+</head>
+<body>
+  <h1 th:text="'Evaluation #' + ${eval.id}"></h1>
+  <div class="meta">
+    <span><b>Subject:</b> <span th:text="${eval.subjectName}">Subject</span></span>
+    <span><b>CourseRealizationId:</b> <span th:text="${eval.courseRealizationId}">0</span></span><br/>
+    <span><b>Type:</b> <span th:text="${eval.evaluationType}">Type</span></span>
+    <span><b>Instrument:</b> <span th:text="${eval.instrument}">Instrument</span></span><br/>
+    <span><b>Start:</b> <span th:text="${eval.startTime}">-</span></span>
+    <span><b>End:</b> <span th:text="${eval.endTime}">-</span></span>
+    <span><b>Max points:</b> <span th:text="${eval.maxPoints}">0</span></span>
+  </div>
+
+  <h2>Attempts</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Student</th>
+        <th>Index</th>
+        <th>Email</th>
+        <th>Points</th>
+        <th>Latest</th>
+        <th>Note</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr th:each="a, i : ${eval.attempts}">
+        <td th:text="${i.index + 1}"></td>
+        <td>
+          <div th:text="${a.student.name}">Name</div>
+          <div class="small" th:text="'ID: ' + ${a.student.id}">ID</div>
+        </td>
+        <td th:text="${a.student.indexNumber}">XX-XX</td>
+        <td th:text="${a.student.email}">mail</td>
+        <td th:text="${a.points}">0</td>
+        <td th:text="${a.latest} ? 'yes' : 'no'">no</td>
+        <td th:text="${a.note} ?: '-'">-</td>
+      </tr>
+    </tbody>
+  </table>
+</body>
+</html>

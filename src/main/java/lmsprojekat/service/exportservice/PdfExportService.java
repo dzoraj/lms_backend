@@ -11,6 +11,7 @@ import org.thymeleaf.spring6.SpringTemplateEngine;
 
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
 
+import lmsprojekat.export.xml.EvaluationXml;
 import lmsprojekat.export.xml.StudentXml;
 import lmsprojekat.export.xml.TeacherXml;
 
@@ -36,6 +37,12 @@ public class PdfExportService {
     String html = thymeleaf.process("students-pdf", ctx); 
     return render(html);
   }
+  public byte[] evaluationToPdf(EvaluationXml evaluation) throws Exception {
+	    org.thymeleaf.context.Context ctx = new org.thymeleaf.context.Context();
+	    ctx.setVariable("eval", evaluation);
+	    String html = thymeleaf.process("evaluation-pdf", ctx);
+	    return render(html);
+	  }
 
   private byte[] render(String html) throws Exception {
 	  Document doc = Jsoup.parse(html);
