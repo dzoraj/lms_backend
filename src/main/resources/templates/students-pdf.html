@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <title>Students Export</title>
+  <style type="text/css">
+    @page { size: A4; margin: 20mm; }
+    body { font-family: DejaVu Sans, sans-serif; font-size: 11px; line-height: 1.35; }
+    h1 { margin: 0 0 12px 0; font-size: 18px; }
+    table { width:100%; border-collapse: collapse; }
+    th, td { border: 1px solid #444; padding: 6px 8px; vertical-align: top; }
+    thead { display: table-header-group; }
+    .muted { color: #555; }
+    .nowrap { white-space: nowrap; }
+    .addr { white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <h1>Students Export</h1>
+
+  <table>
+    <thead>
+      <tr>
+        <th class="nowrap">ID</th>
+        <th>Name</th>
+        <th>Email</th>
+        <th class="nowrap">JMBG</th>
+        <th>Address</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr th:each="s : ${students}">
+        <td th:text="${s.id}">1</td>
+        <td th:text="${s.name}">Name</td>
+        <td th:text="${s.email}">email@example.com</td>
+        <td th:text="${s.jmbg}">0000000000000</td>
+
+        <td>
+          <div th:if="${s.address == null}" class="muted">-</div>
+          <div th:if="${s.address != null}" class="addr">
+            <span th:text="${s.address.street}">Street</span>
+            <span th:text="${s.address.number}">00</span>,
+            <span th:text="${s.address.city}">City</span>,
+            <span th:text="${s.address.country}">Country</span>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</body>
+</html>

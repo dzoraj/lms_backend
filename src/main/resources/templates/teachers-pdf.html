@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <title>Teachers Export</title>
+  <style type="text/css">
+  
+    @page { size: A4; margin: 20mm; }
+    body { font-family: DejaVu Sans, sans-serif; font-size: 11px; line-height: 1.35; }
+    h1 { margin: 0 0 12px 0; font-size: 18px; }
+    table { width:100%; border-collapse: collapse; }
+    th, td { border: 1px solid #444; padding: 6px 8px; vertical-align: top; }
+    thead { display: table-header-group; }
+    .muted { color: #555; }
+    .nowrap { white-space: nowrap; }
+    .title-line { margin-bottom: 4px; }
+    .addr { white-space: pre-wrap; }
+  </style>
+</head>
+<body>
+  <h1>Teachers Export</h1>
+
+  <table>
+    <thead>
+      <tr>
+        <th class="nowrap">ID</th>
+        <th>Name</th>
+        <th>Email</th>
+        <th class="nowrap">JMBG</th>
+        <th>Titles</th>
+        <th>Address</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr th:each="t : ${teachers}">
+        <td th:text="${t.id}">1</td>
+        <td>
+          <div th:text="${t.name}">Name</div>
+          <div class="muted" th:if="${t.biography != null and !#strings.isEmpty(t.biography)}"
+               th:text="${t.biography}">Biography…</div>
+        </td>
+        <td th:text="${t.email}">email@example.com</td>
+        <td th:text="${t.jmbg}">0000000000000</td>
+        
+        <td>
+          <div th:if="${#lists.isEmpty(t.titles)}" class="muted">-</div>
+
+          <div th:each="ti : ${t.titles}" class="title-line">
+            <span th:text="${ti.selectionDate}">2024-01-01</span>
+            <span th:if="${ti.endDate != null}">
+              &#160;—&#160;<span th:text="${ti.endDate}">2024-12-31</span>
+            </span>
+
+            <span th:if="${ti.types != null and !#lists.isEmpty(ti.types)}">
+              &#160;[
+              <span th:each="ty,iter : ${ti.types}">
+                <span th:text="${ty}">Type</span><span th:if="${!iter.last}">, </span>
+              </span>
+              ]
+            </span>
+          </div>
+        </td>
+
+        <td>
+          <div th:if="${t.address == null}" class="muted">-</div>
+          <div th:if="${t.address != null}" class="addr">
+            <span th:text="${t.address.street}">Street</span>
+            <span th:text="${t.address.number}">00</span>,
+            <span th:text="${t.address.city}">City</span>,
+            <span th:text="${t.address.country}">Country</span>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</body>
+</html>
