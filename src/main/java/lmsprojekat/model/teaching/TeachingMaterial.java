@@ -45,7 +45,8 @@ public class TeachingMaterial extends SoftDeletableEntity{
 
     @OneToMany(mappedBy = "teachingMaterial")
     private List<File> files;
-
+    @Column(nullable = false)
+    private Integer inventoryCount = 0;
 
 	public TeachingMaterial() {
 		super();
@@ -62,6 +63,20 @@ public class TeachingMaterial extends SoftDeletableEntity{
 		this.yearOfPublication = yearOfPublication;
 		this.learningOutcome = learningOutcome;
 		this.files = files;
+	}
+	
+
+
+	public TeachingMaterial(Long id, String name, String authors, LocalDateTime yearOfPublication,
+			LearningOutcome learningOutcome, List<File> files, Integer inventoryCount) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.authors = authors;
+		this.yearOfPublication = yearOfPublication;
+		this.learningOutcome = learningOutcome;
+		this.files = files;
+		this.inventoryCount = inventoryCount;
 	}
 
 
@@ -123,4 +138,15 @@ public class TeachingMaterial extends SoftDeletableEntity{
 	public void setFiles(List<File> files) {
 		this.files = files;
 	}
+
+
+	public Integer getInventoryCount() {
+		return inventoryCount;
+	}
+
+
+	public void setInventoryCount(Integer inventoryCount) {
+		this.inventoryCount = inventoryCount;
+	}
+	
 }
