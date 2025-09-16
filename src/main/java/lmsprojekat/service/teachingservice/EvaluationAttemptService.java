@@ -12,19 +12,17 @@ import lmsprojekat.dto.teachingdto.EvaluationAttemptDTO;
 import lmsprojekat.model.grading.GradeBoundary;
 import lmsprojekat.model.grading.GradingScheme;
 import lmsprojekat.model.student.StudentInYear;
-import lmsprojekat.model.subject.CourseAttendance;
 import lmsprojekat.model.subject.Subject;
 import lmsprojekat.model.teaching.EvaluationAttempt;
 import lmsprojekat.model.teaching.ExamApplication;
 import lmsprojekat.model.teaching.KnowledgeEvaluation;
 import lmsprojekat.repository.studentrepo.StudentInYearRepository;
-import lmsprojekat.repository.subjectrepo.CourseAttendanceRepository;
 import lmsprojekat.repository.subjectrepo.SubjectRepository;
 import lmsprojekat.repository.teachingrepo.EvaluationAttemptRepository;
 import lmsprojekat.repository.teachingrepo.ExamApplicationRepository;
 import lmsprojekat.repository.teachingrepo.KnowledgeEvaluationRepository;
 import lmsprojekat.service.AbstractCrudService;
-
+import lmsprojekat.service.subjectservice.CourseAttendanceService;
 @Service
 public class EvaluationAttemptService extends AbstractCrudService<EvaluationAttemptDTO, EvaluationAttempt, Long> {
 
@@ -32,23 +30,21 @@ public class EvaluationAttemptService extends AbstractCrudService<EvaluationAtte
     private final KnowledgeEvaluationRepository knowledgeEvaluationRepository;
     private final StudentInYearRepository studentInYearRepository;
     private final ExamApplicationRepository examApplicationRepository;
-    private final CourseAttendanceRepository courseAttendanceRepository;
     private final SubjectRepository subjectRepository;
+    private final CourseAttendanceService courseAttendanceService;
 
-    public EvaluationAttemptService(
-            EvaluationAttemptRepository evaluationAttemptRepository,
-            KnowledgeEvaluationRepository knowledgeEvaluationRepository,
-            StudentInYearRepository studentInYearRepository,
-            ExamApplicationRepository examApplicationRepository,
-            CourseAttendanceRepository courseAttendanceRepository,
-            SubjectRepository subjectRepository
-    ) {
+    public EvaluationAttemptService(EvaluationAttemptRepository evaluationAttemptRepository,
+                                    KnowledgeEvaluationRepository knowledgeEvaluationRepository,
+                                    StudentInYearRepository studentInYearRepository,
+                                    ExamApplicationRepository examApplicationRepository,
+                                    SubjectRepository subjectRepository,
+                                    CourseAttendanceService courseAttendanceService) {
         this.evaluationAttemptRepository = evaluationAttemptRepository;
         this.knowledgeEvaluationRepository = knowledgeEvaluationRepository;
         this.studentInYearRepository = studentInYearRepository;
         this.examApplicationRepository = examApplicationRepository;
-        this.courseAttendanceRepository = courseAttendanceRepository;
         this.subjectRepository = subjectRepository;
+        this.courseAttendanceService = courseAttendanceService;
     }
 
     @Override
@@ -109,8 +105,8 @@ public class EvaluationAttemptService extends AbstractCrudService<EvaluationAtte
 
         if (entity.getEvaluation() != null && entity.getStudentInYear() != null) {
             updateFinalSubjectGrade(
-                entity.getStudentInYear().getStudent().getId(),
-                entity.getEvaluation().getCourseRealization().getSubject().getId()
+                    entity.getStudentInYear().getStudent().getId(),
+                    entity.getEvaluation().getCourseRealization().getSubject().getId()
             );
         }
     }
@@ -128,9 +124,9 @@ public class EvaluationAttemptService extends AbstractCrudService<EvaluationAtte
         }
 
         evaluationAttemptRepository.markOldAttemptsAsNotLatest(
-            application.getStudentInYear().getId(),
-            exam.getCourseRealization().getId(),
-            exam.getEvaluationType().getId()
+                application.getStudentInYear().getId(),
+                exam.getCourseRealization().getId(),
+                exam.getEvaluationType().getId()
         );
 
         EvaluationAttempt attempt = new EvaluationAttempt();
@@ -142,13 +138,12 @@ public class EvaluationAttemptService extends AbstractCrudService<EvaluationAtte
         evaluationAttemptRepository.save(attempt);
 
         updateFinalSubjectGrade(
-            application.getStudentInYear().getStudent().getId(),
-            exam.getCourseRealization().getSubject().getId()
+                application.getStudentInYear().getStudent().getId(),
+                exam.getCourseRealization().getSubject().getId()
         );
 
         return toDTO(attempt);
     }
-
 
     private void updateFinalSubjectGrade(Long studentId, Long subjectId) {
         List<EvaluationAttempt> attempts = evaluationAttemptRepository.findLatestByStudentAndSubject(studentId, subjectId);
@@ -159,8 +154,8 @@ public class EvaluationAttemptService extends AbstractCrudService<EvaluationAtte
             if (ke != null && ke.getPoints() != null) {
                 int max = ke.getPoints();
                 int pts = attempt.getPoints() != null ? attempt.getPoints() : 0;
-                if (pts < (max / 2)) { // threshold = 50%
-                    setFinalGrade(studentId, subjectId, 5);
+                if (pts < (max / 2)) {
+                    courseAttendanceService.createOrUpdateFinalGrade(studentId, subjectId, 5);
                     return;
                 }
             }
@@ -187,14 +182,6 @@ public class EvaluationAttemptService extends AbstractCrudService<EvaluationAtte
             }
         }
 
-        setFinalGrade(studentId, subjectId, grade);
-    }
-
-    private void setFinalGrade(Long studentId, Long subjectId, int grade) {
-        CourseAttendance ca = courseAttendanceRepository.findByStudentAndSubject(studentId, subjectId);
-        if (ca != null) {
-            ca.setKonacnaOcena(grade);
-            courseAttendanceRepository.save(ca);
-        }
+        courseAttendanceService.createOrUpdateFinalGrade(studentId, subjectId, grade);
     }
 }

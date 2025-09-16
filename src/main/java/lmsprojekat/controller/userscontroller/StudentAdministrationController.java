@@ -19,12 +19,13 @@ public class StudentAdministrationController {
     @PostMapping("/assign-student-role")
     public ResponseEntity<?> assignStudentRole(@RequestBody RoleAssignmentRequest request) {
         try {
-            adminService.assignRoleToUser(request.userId, "STUDENT");
-            return ResponseEntity.ok("Student role assigned successfully.");
+            adminService.assignRoleToUser(request.userId, request.roleName);
+            return ResponseEntity.ok(request.roleName + " role assigned successfully.");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
 
     @DeleteMapping("/remove-student-role")
     public ResponseEntity<?> removeStudentRole(@RequestParam Long userId) {

@@ -2,10 +2,13 @@ package lmsprojekat.service.dashboardservice;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
 import lmsprojekat.dto.studentdto.StudentProfileDTO;
+import lmsprojekat.model.subject.CourseAttendance;
+import lmsprojekat.model.subject.Subject;
 import lmsprojekat.model.users.Student;
 import lmsprojekat.repository.studentrepo.StudentInYearRepository;
 import lmsprojekat.repository.subjectrepo.CourseAttendanceRepository;
@@ -50,7 +53,7 @@ public class StudentDashboardService {
                     var e = new StudentProfileDTO.EnrollmentDTO();
                     e.id = siy.getId();
                     e.indexNumber = siy.getIndexNumber();
-                    e.enrollmentDate = siy.getEnrollmentDate().toString();
+                    e.enrollmentDate = siy.getEnrollmentDate() != null ? siy.getEnrollmentDate().toString() : null;
                     e.studyYearId = siy.getStudyYear() != null ? siy.getStudyYear().getId() : null;
                     return e;
                 }).toList());
@@ -66,44 +69,46 @@ public class StudentDashboardService {
                 }).toList());
 
         dto.setExamAttempts(evalAttemptRepo.findAllByStudentId(studentId).stream()
-        	    .map(ea -> {
-        	        var a = new StudentProfileDTO.ExamAttemptDTO();
-        	        var ke = ea.getEvaluation();
-        	        var subj = ke.getCourseRealization().getSubject();
+                .map(ea -> {
+                    var a = new StudentProfileDTO.ExamAttemptDTO();
+                    var ke = ea.getEvaluation();
+                    var subj = ke.getCourseRealization().getSubject();
+                    a.subjectName = subj.getName();
+                    a.espb = subj.getEspb();
+                    a.evaluationId = ke.getId();
+                    a.points = ea.getPoints();
+                    a.note = ea.getNote();
+                    a.maxPoints = ke.getPoints();
+                    a.testPassed = (a.maxPoints != null && a.points != null && a.points >= a.maxPoints / 2);
+                    return a;
+                }).toList());
 
-        	        a.subjectName = subj.getName();
-        	        a.espb = subj.getEspb();
-        	        a.evaluationId = ke.getId();
-        	        a.points = ea.getPoints();
-        	        a.note = ea.getNote();
-
-        	        a.maxPoints = ke.getPoints();
-        	        a.testPassed = (a.maxPoints != null && a.points != null && a.points >= a.maxPoints / 2);
-
-        	        return a;
-        	    }).toList());
-
-
+        List<CourseAttendance> cas = caRepo.findAllByStudentIdWithRealizationAndSubject(studentId);
         dto.setAttendingSubjects(
-        	    evalAttemptRepo.findAllByStudentId(studentId).stream()
-        	        .map(ea -> ea.getEvaluation()
-        	                     .getCourseRealization()
-        	                     .getSubject())
-        	        .filter(Objects::nonNull)
-        	        .distinct()
-        	        .map(subj -> {
-        	            var s = new StudentProfileDTO.AttendingSubjectDTO();
-        	            s.subjectId = subj.getId();
-        	            s.name = subj.getName();
-        	            s.espb = subj.getEspb();
-        	            s.lectureCount = subj.getLectureCount();
-        	            s.labCount = subj.getLabCount();
-        	            s.mandatory = subj.getMandatory();
-        	            return s;
-        	        })
-        	        .toList()
-        	);
-
+                cas.stream()
+                   .map(CourseAttendance::getCourseRealization)
+                   .filter(Objects::nonNull)
+                   .map(cr -> cr.getSubject())
+                   .filter(Objects::nonNull)
+                   .collect(Collectors.toMap(
+                           Subject::getId,
+                           subj -> subj,
+                           (a, b) -> a
+                   ))
+                   .values()
+                   .stream()
+                   .map(subj -> {
+                       var s = new StudentProfileDTO.AttendingSubjectDTO();
+                       s.subjectId = subj.getId();
+                       s.name = subj.getName();
+                       s.espb = subj.getEspb();
+                       s.lectureCount = subj.getLectureCount();
+                       s.labCount = subj.getLabCount();
+                       s.mandatory = subj.getMandatory();
+                       return s;
+                   })
+                   .toList()
+        );
 
         dto.setFailedExams(List.of());
         dto.setInfractions(List.of());
