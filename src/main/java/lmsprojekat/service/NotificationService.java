@@ -45,18 +45,24 @@ public class NotificationService extends AbstractCrudService<NotificationDTO, No
 
     @Override
     public NotificationDTO toDTO(Notification entity) {
+        String courseName = null;
+        if (entity.getCourseRealization() != null && entity.getCourseRealization().getSubject() != null) {
+            courseName = entity.getCourseRealization().getSubject().getName();
+        }
         return new NotificationDTO(
-                entity.getId(),
-                entity.getTitle(),
-                entity.getContent(),
-                entity.getTimePosted(),
-                entity.getCourseRealization() != null ? entity.getCourseRealization().getId() : null,
-                entity.getTeacherOnCourse() != null ? entity.getTeacherOnCourse().getId() : null,
-                entity.getAttachments() != null
-                        ? entity.getAttachments().stream().map(File::getId).collect(Collectors.toList())
-                        : List.of()
+            entity.getId(),
+            entity.getTitle(),
+            entity.getContent(),
+            entity.getTimePosted(),
+            entity.getCourseRealization() != null ? entity.getCourseRealization().getId() : null,
+            entity.getTeacherOnCourse() != null ? entity.getTeacherOnCourse().getId() : null,
+            entity.getAttachments() != null
+                ? entity.getAttachments().stream().map(File::getId).collect(Collectors.toList())
+                : List.of(),
+            courseName
         );
     }
+
 
     @Override
     public Notification toEntity(NotificationDTO dto) {
@@ -153,6 +159,7 @@ public class NotificationService extends AbstractCrudService<NotificationDTO, No
     }
 
 
+
     public List<NotificationDTO> getNotificationsForTeacherAndSubject(Long teacherId, Long subjectId) {
         return notificationRepository.findByTeacherIdAndSubjectId(teacherId, subjectId)
                 .stream().map(this::toDTO).toList();
@@ -167,4 +174,23 @@ public class NotificationService extends AbstractCrudService<NotificationDTO, No
         return teacherOnCourseRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("TeacherOnCourse not found with id: " + id));
     }
+    public List<NotificationDTO> getGeneralNotifications() {
+        return notificationRepository.findGeneral().stream().map(this::toDTO).toList();
+    }
+
+    public NotificationDTO createGeneral(NotificationDTO dto) {
+        Notification entity = new Notification();
+        entity.setId(dto.getId());
+        entity.setTitle(dto.getTitle());
+        entity.setContent(dto.getContent());
+        entity.setTimePosted(LocalDateTime.now());
+        entity.setCourseRealization(null);
+        entity.setTeacherOnCourse(null);
+        entity = notificationRepository.save(entity);
+        NotificationDTO saved = toDTO(entity);
+        messagingTemplate.convertAndSend("/topic/general-notifications", saved);
+        messagingTemplate.convertAndSend("/topic/notifications", saved);
+        return saved;
+    }
+
 }

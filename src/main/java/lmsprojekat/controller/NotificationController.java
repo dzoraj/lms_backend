@@ -2,6 +2,7 @@ package lmsprojekat.controller;
 
 import java.util.List;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import lmsprojekat.dto.NotificationDTO;
@@ -60,5 +61,18 @@ public class NotificationController {
             @PathVariable Long subjectId
     ) {
         return service.getNotificationsForTeacherAndSubject(teacherId, subjectId);
+    }
+
+    @GetMapping("/notifications/general")
+    public List<NotificationDTO> listGeneral() {
+        return service.getGeneralNotifications();
+    }
+
+    @PostMapping("/notifications/general")
+    @PreAuthorize("hasAnyRole('SA','ADMIN')")
+    public NotificationDTO createGeneral(@RequestBody NotificationDTO dto) {
+        dto.setCourseRealizationId(null);
+        dto.setTeacherOnCourseId(null);
+        return service.createGeneral(dto);
     }
 }

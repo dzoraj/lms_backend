@@ -12,12 +12,14 @@ public class NotificationDTO {
 	private Long courseRealizationId;
 	private Long teacherOnCourseId;
 	private List<Long> attachmentIds;
+	
+	private String courseName;
 
 	public NotificationDTO() {
 	}
 
 	public NotificationDTO(Long id, String title, String content, LocalDateTime timePosted, Long courseRealizationId,
-			Long teacherOnCourseId, List<Long> attachmentIds) {
+			Long teacherOnCourseId, List<Long> attachmentIds, String courseName) {
 		this.id = id;
 		this.title = title;
 		this.content = content;
@@ -25,6 +27,7 @@ public class NotificationDTO {
 		this.courseRealizationId = courseRealizationId;
 		this.teacherOnCourseId = teacherOnCourseId;
 		this.attachmentIds = attachmentIds;
+		this.courseName = courseName;
 	}
 
 	public Long getId() {
@@ -82,5 +85,14 @@ public class NotificationDTO {
 	public void setAttachmentIds(List<Long> attachmentIds) {
 		this.attachmentIds = attachmentIds;
 	}
+
+	public String getCourseName() {
+		return courseName;
+	}
+
+	public void setCourseName(String courseName) {
+		this.courseName = courseName;
+	}
+	
 
 }

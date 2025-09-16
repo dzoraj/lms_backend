@@ -1,11 +1,9 @@
 package lmsprojekat.repository;
 
 import java.util.List;
-
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-
 import lmsprojekat.model.Notification;
 
 @Repository
@@ -37,4 +35,12 @@ public interface NotificationRepository extends SoftDeleteRepository<Notificatio
     """)
     List<Notification> findByTeacherIdAndSubjectId(@Param("teacherId") Long teacherId,
                                                    @Param("subjectId") Long subjectId);
+
+    @Query("""
+        SELECT n
+        FROM Notification n
+        WHERE n.courseRealization IS NULL AND n.teacherOnCourse IS NULL
+        ORDER BY n.timePosted DESC
+    """)
+    List<Notification> findGeneral();
 }
