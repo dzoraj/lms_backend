@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+  <xsd:element name="evaluation" type="Evaluation"/>
+
+  <xsd:complexType name="Evaluation">
+    <xsd:sequence>
+      <xsd:element name="id" type="xsd:long"/>
+      <xsd:element name="subjectName" type="xsd:string" minOccurs="0"/>
+      <xsd:element name="courseRealizationId" type="xsd:long" minOccurs="0"/>
+      <xsd:element name="evaluationType" type="xsd:string" minOccurs="0"/>
+      <xsd:element name="instrument" type="xsd:string" minOccurs="0"/>
+      <xsd:element name="maxPoints" type="xsd:int" minOccurs="0"/>
+      <xsd:element name="startTime" type="xsd:dateTime" minOccurs="0"/>
+      <xsd:element name="endTime" type="xsd:dateTime" minOccurs="0"/>
+      <xsd:element name="attempts" type="AttemptList" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="AttemptList">
+    <xsd:sequence>
+      <xsd:element name="attempt" type="Attempt" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Attempt">
+    <xsd:sequence>
+      <xsd:element name="id" type="xsd:long" minOccurs="0"/>
+      <xsd:element name="points" type="xsd:int"/>
+      <xsd:element name="latest" type="xsd:boolean" minOccurs="0"/>
+      <xsd:element name="note" type="xsd:string" minOccurs="0"/>
+      <xsd:element name="student" type="Student"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Student">
+    <xsd:sequence>
+      <xsd:element name="id" type="xsd:long"/>
+      <xsd:element name="name" type="xsd:string" minOccurs="0"/>
+      <xsd:element name="email" type="xsd:string" minOccurs="0"/>
+      <xsd:element name="indexNumber" type="xsd:string" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+</xsd:schema>
