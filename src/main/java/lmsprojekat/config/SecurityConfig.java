@@ -39,7 +39,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/documents/**").hasAnyRole("ADMIN", "SA")
                 .requestMatchers("/api/schedule/**").hasAnyRole("ADMIN", "SA")
                 .requestMatchers("/api/library/**").hasAnyRole("ADMIN", "SA")
-
+                .requestMatchers("/api/faculty-supplies/**").hasAnyRole("ADMIN","SA")
                 .requestMatchers(HttpMethod.OPTIONS).permitAll() 
                 .anyRequest().authenticated()
             )
