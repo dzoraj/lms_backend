@@ -19,7 +19,7 @@ public class XmlValidationService {
     public XmlValidationService() {
         try {
             SchemaFactory f = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            URL schemaUrl = new ClassPathResource("templates/evaluation.xsd").getURL();
+            URL schemaUrl = new ClassPathResource("templates\\evaluation.xsd").getURL();
             this.schema = f.newSchema(schemaUrl);
         } catch (Exception e) {
             throw new IllegalStateException("Failed to load evaluation.xsd", e);

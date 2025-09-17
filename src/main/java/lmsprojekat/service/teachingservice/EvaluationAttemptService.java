@@ -145,7 +145,7 @@ public class EvaluationAttemptService extends AbstractCrudService<EvaluationAtte
         return toDTO(attempt);
     }
 
-    private void updateFinalSubjectGrade(Long studentId, Long subjectId) {
+    public void updateFinalSubjectGrade(Long studentId, Long subjectId) {
         List<EvaluationAttempt> attempts = evaluationAttemptRepository.findLatestByStudentAndSubject(studentId, subjectId);
         if (attempts.isEmpty()) return;
 
