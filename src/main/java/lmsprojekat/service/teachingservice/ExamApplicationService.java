@@ -46,13 +46,12 @@ public class ExamApplicationService extends AbstractCrudService<ExamApplicationD
         dto.setApplicationDate(entity.getApplicationDate());
         dto.setStudentInYearId(entity.getStudentInYear().getId());
         dto.setKnowledgeEvaluationId(entity.getKnowledgeEvaluation().getId());
-        dto.setStudentName(entity.getStudentInYear().getStudent().getId().toString());
+        dto.setStudentName(entity.getStudentInYear().getStudent().getName());
         dto.setIndexNumber(entity.getStudentInYear().getIndexNumber());
         dto.setExamDate(entity.getKnowledgeEvaluation().getStartTime());
         dto.setEvaluationType(entity.getKnowledgeEvaluation().getEvaluationType().getName());
         return dto;
     }
-
 
     @Override
     protected ExamApplication toEntity(ExamApplicationDTO dto) {
@@ -65,11 +64,11 @@ public class ExamApplicationService extends AbstractCrudService<ExamApplicationD
     }
 
     @Override
-    protected void updateEntity(ExamApplication entity, ExamApplicationDTO dto) {
+    protected void updateEntity(ExamApplication entity, ExamApplicationDTO dto) { }
 
-    }
     public List<UpcomingExamDTO> getUpcomingExamsForStudent(Long studentId) {
-        StudentInYear studentInYear = studentInYearRepository.findByStudent_Id(studentId)
+        StudentInYear studentInYear = studentInYearRepository
+            .findTopByStudent_IdOrderByEnrollmentDateDesc(studentId)
             .orElseThrow(() -> new IllegalArgumentException("Student not enrolled"));
 
         List<KnowledgeEvaluation> evaluations =
@@ -95,13 +94,11 @@ public class ExamApplicationService extends AbstractCrudService<ExamApplicationD
             ))
             .collect(Collectors.toList());
     }
+
     public List<ExamApplicationDTO> findByTeacherAndSubject(Long teacherId, Long subjectId) {
         return examApplicationRepository.findByTeacherAndSubject(teacherId, subjectId)
                 .stream()
                 .map(this::toDTO)
                 .toList();
     }
-
-
-
 }

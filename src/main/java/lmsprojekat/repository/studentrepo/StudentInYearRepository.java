@@ -2,12 +2,15 @@ package lmsprojekat.repository.studentrepo;
 
 import java.util.List;
 import java.util.Optional;
+
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
 import lmsprojekat.model.student.StudentInYear;
 import lmsprojekat.repository.SoftDeleteRepository;
 
 public interface StudentInYearRepository extends SoftDeleteRepository<StudentInYear, Long> {
+
     @Query("""
         SELECT siy
         FROM StudentInYear siy
@@ -16,7 +19,7 @@ public interface StudentInYearRepository extends SoftDeleteRepository<StudentInY
     """)
     List<StudentInYear> findAllByStudentId(@Param("studentId") Long studentId);
 
-    Optional<StudentInYear> findByStudent_Id(Long studentId);
+    Optional<StudentInYear> findTopByStudent_IdOrderByEnrollmentDateDesc(Long studentId);
 
-    Optional<StudentInYear> findTopByStudentIdOrderByEnrollmentDateDesc(Long studentId);
+
 }
