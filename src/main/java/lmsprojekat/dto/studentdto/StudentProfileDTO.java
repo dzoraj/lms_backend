@@ -20,8 +20,6 @@ public class StudentProfileDTO {
 	private String thesis;
 	private List<AttendingSubjectDTO> attendingSubjects;
 
-
-
 	public static class EnrollmentDTO {
 		public Long id;
 		public String enrollmentDate;
@@ -34,6 +32,7 @@ public class StudentProfileDTO {
 		public Integer espb;
 		public Integer grade;
 		public Integer finalPoints;
+		public Long subjectId; 
 	}
 
 	public static class ExamAttemptDTO {
@@ -42,8 +41,9 @@ public class StudentProfileDTO {
 		public Long evaluationId;
 		public Integer points;
 		public String note;
-	    public Integer maxPoints;
-	    public boolean testPassed;
+		public Integer maxPoints;
+		public boolean testPassed;
+		public Boolean latest;
 	}
 
 	public static class FailedExamDTO {
@@ -51,15 +51,19 @@ public class StudentProfileDTO {
 		public Integer attempts;
 		public Integer lastPoints;
 	}
-	public static class AttendingSubjectDTO {
-	    public Long subjectId;
-	    public String name;
-	    public Integer espb;
-	    public Integer lectureCount;
-	    public Integer labCount;
-	    public Boolean mandatory;
-	}
 
+	public static class AttendingSubjectDTO {
+		public Long subjectId;
+		public String name;
+		public Integer espb;
+		public Integer lectureCount;
+		public Integer labCount;
+		public Boolean mandatory;
+
+		public Integer pointsEarned;
+		public Integer totalPoints;
+		public Double progress;
+	}
 
 	public Long getId() {
 		return id;
@@ -156,11 +160,12 @@ public class StudentProfileDTO {
 	public void setThesis(String thesis) {
 		this.thesis = thesis;
 	}
+
 	public List<AttendingSubjectDTO> getAttendingSubjects() {
-	    return attendingSubjects;
+		return attendingSubjects;
 	}
 
 	public void setAttendingSubjects(List<AttendingSubjectDTO> attendingSubjects) {
-	    this.attendingSubjects = attendingSubjects;
+		this.attendingSubjects = attendingSubjects;
 	}
 }

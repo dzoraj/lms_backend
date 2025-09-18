@@ -10,7 +10,7 @@ import lmsprojekat.service.NotificationService;
 
 @RestController
 @RequestMapping("/api")
-public class NotificationController {
+public class NotificationController extends BaseCrudController<NotificationDTO, Long> {
 
     private final NotificationService service;
 
@@ -18,9 +18,39 @@ public class NotificationController {
         this.service = service;
     }
 
+    @Override
+    protected NotificationService getService() {
+        return service;
+    }
+
+    @Override
+    @GetMapping("/notifications")
+    public List<NotificationDTO> findAll() {
+        return super.findAll();
+    }
+
+    @Override
+    @GetMapping("/notifications/{id}")
+    public NotificationDTO findById(@PathVariable Long id) {
+        return super.findById(id);
+    }
+
+    @Override
     @PostMapping("/notifications")
-    public NotificationDTO create(@RequestBody NotificationDTO dto) {
-        return service.save(dto);
+    public NotificationDTO save(@RequestBody NotificationDTO dto) {
+        return super.save(dto);
+    }
+
+    @Override
+    @PutMapping("/notifications/{id}")
+    public NotificationDTO update(@PathVariable Long id, @RequestBody NotificationDTO dto) {
+        return super.update(id, dto);
+    }
+
+    @Override
+    @DeleteMapping("/notifications/{id}")
+    public void delete(@PathVariable Long id) {
+        super.delete(id);
     }
 
     @GetMapping("/notifications/course/{courseId}")

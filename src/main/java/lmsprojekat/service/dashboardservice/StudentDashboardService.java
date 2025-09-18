@@ -62,9 +62,11 @@ public class StudentDashboardService {
                 .filter(ca -> ca.getKonacnaOcena() != null)
                 .map(ca -> {
                     var p = new StudentProfileDTO.PassedExamDTO();
-                    p.subjectName = ca.getCourseRealization().getSubject().getName();
-                    p.espb = ca.getCourseRealization().getSubject().getEspb();
+                    var subj = ca.getCourseRealization().getSubject();
+                    p.subjectName = subj.getName();
+                    p.espb = subj.getEspb();
                     p.grade = ca.getKonacnaOcena();
+                    p.subjectId = subj.getId(); 
                     return p;
                 }).toList());
 
@@ -80,34 +82,45 @@ public class StudentDashboardService {
                     a.note = ea.getNote();
                     a.maxPoints = ke.getPoints();
                     a.testPassed = (a.maxPoints != null && a.points != null && a.points >= a.maxPoints / 2);
+                    a.latest = resolveLatest(ea);
                     return a;
                 }).toList());
 
         List<CourseAttendance> cas = caRepo.findAllByStudentIdWithRealizationAndSubject(studentId);
         dto.setAttendingSubjects(
-                cas.stream()
-                   .map(CourseAttendance::getCourseRealization)
-                   .filter(Objects::nonNull)
-                   .map(cr -> cr.getSubject())
-                   .filter(Objects::nonNull)
-                   .collect(Collectors.toMap(
-                           Subject::getId,
-                           subj -> subj,
-                           (a, b) -> a
-                   ))
-                   .values()
-                   .stream()
-                   .map(subj -> {
-                       var s = new StudentProfileDTO.AttendingSubjectDTO();
-                       s.subjectId = subj.getId();
-                       s.name = subj.getName();
-                       s.espb = subj.getEspb();
-                       s.lectureCount = subj.getLectureCount();
-                       s.labCount = subj.getLabCount();
-                       s.mandatory = subj.getMandatory();
-                       return s;
-                   })
-                   .toList()
+            cas.stream()
+               .map(CourseAttendance::getCourseRealization)
+               .filter(Objects::nonNull)
+               .map(cr -> cr.getSubject())
+               .filter(Objects::nonNull)
+               .collect(Collectors.toMap(
+                   Subject::getId,
+                   subj -> subj,
+                   (a, b) -> a
+               ))
+               .values()
+               .stream()
+               .map(subj -> {
+                   var s = new StudentProfileDTO.AttendingSubjectDTO();
+                   s.subjectId = subj.getId();
+                   s.name = subj.getName();
+                   s.espb = subj.getEspb();
+                   s.lectureCount = subj.getLectureCount();
+                   s.labCount = subj.getLabCount();
+                   s.mandatory = subj.getMandatory();
+
+                   Integer earned = evalAttemptRepo.sumLatestPointsByStudentAndSubject(studentId, subj.getId());
+                   Integer total = (subj.getGradingScheme() != null) ? subj.getGradingScheme().getTotalPoints() : null;
+
+                   s.pointsEarned = earned != null ? earned : 0;
+                   s.totalPoints = total;
+                   s.progress = (total != null && total > 0)
+                           ? (s.pointsEarned.doubleValue() / total.doubleValue())
+                           : null;
+
+                   return s;
+               })
+               .toList()
         );
 
         dto.setFailedExams(List.of());
@@ -116,5 +129,21 @@ public class StudentDashboardService {
         dto.setThesis(null);
 
         return dto;
+    }
+
+    private Boolean resolveLatest(Object ea) {
+        try {
+            var m1 = ea.getClass().getMethod("getLatest");
+            Object v1 = m1.invoke(ea);
+            if (v1 instanceof Boolean) return (Boolean) v1;
+            if (v1 instanceof Number) return ((Number) v1).intValue() == 1;
+        } catch (Exception ignored) {}
+        try {
+            var m2 = ea.getClass().getMethod("isLatest");
+            Object v2 = m2.invoke(ea);
+            if (v2 instanceof Boolean) return (Boolean) v2;
+            if (v2 instanceof Number) return ((Number) v2).intValue() == 1;
+        } catch (Exception ignored) {}
+        return null;
     }
 }

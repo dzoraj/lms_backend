@@ -106,6 +106,24 @@ public interface EvaluationAttemptRepository extends SoftDeleteRepository<Evalua
         @Param("courseRealizationId") Long courseRealizationId,
         @Param("evaluationTypeId") Long evaluationTypeId
     );
+    @Query("""
+    	    SELECT COALESCE(SUM(ea.points), 0)
+    	    FROM EvaluationAttempt ea
+    	    JOIN ea.evaluation ke
+    	    JOIN ke.courseRealization cr
+    	    JOIN cr.subject s
+    	    WHERE ea.deleted = false
+    	      AND ke.deleted = false
+    	      AND cr.deleted = false
+    	      AND s.deleted = false
+    	      AND ea.isLatest = true
+    	      AND ea.studentInYear.student.id = :studentId
+    	      AND s.id = :subjectId
+    	""")
+    	Integer sumLatestPointsByStudentAndSubject(
+    	    @Param("studentId") Long studentId,
+    	    @Param("subjectId") Long subjectId
+    	);
 
 
 }
