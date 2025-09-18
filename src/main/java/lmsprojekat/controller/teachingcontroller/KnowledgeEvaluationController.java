@@ -1,8 +1,7 @@
 package lmsprojekat.controller.teachingcontroller;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
+import java.util.List;
+import org.springframework.web.bind.annotation.*;
 import lmsprojekat.controller.BaseCrudController;
 import lmsprojekat.dto.teachingdto.KnowledgeEvaluationDTO;
 import lmsprojekat.service.teachingservice.KnowledgeEvaluationService;
@@ -13,12 +12,13 @@ public class KnowledgeEvaluationController extends BaseCrudController<KnowledgeE
 
     private final KnowledgeEvaluationService service;
 
-    public KnowledgeEvaluationController(KnowledgeEvaluationService service) {
-        this.service = service;
-    }
+    public KnowledgeEvaluationController(KnowledgeEvaluationService service) { this.service = service; }
 
     @Override
-    protected KnowledgeEvaluationService getService() {
-        return service;
+    protected KnowledgeEvaluationService getService() { return service; }
+
+    @GetMapping("/by-subject/{subjectId}")
+    public List<KnowledgeEvaluationDTO> bySubject(@PathVariable Long subjectId) {
+        return service.findBySubject(subjectId);
     }
 }

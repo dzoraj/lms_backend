@@ -64,11 +64,24 @@ public class QuizService {
 
     @Transactional
     public QuizDefinitionDTO getByEvaluation(Long knowledgeEvaluationId) {
+        // If NONE, create an empty QuizDefinition for this KE
         QuizDefinition def = quizDefRepo.findByKnowledgeEvaluation_IdAndDeletedFalse(knowledgeEvaluationId)
-                .orElseThrow(() -> new EntityNotFoundException("Quiz not found for KnowledgeEvaluation " + knowledgeEvaluationId));
+            .orElseGet(() -> {
+                KnowledgeEvaluation ke = keRepo.findById(knowledgeEvaluationId)
+                    .orElseThrow(() -> new EntityNotFoundException("KnowledgeEvaluation not found " + knowledgeEvaluationId));
+                QuizDefinition n = new QuizDefinition();
+                n.setKnowledgeEvaluation(ke);
+                n.setTitle(ke.getEvaluationType() != null ? ke.getEvaluationType().getName() + " Quiz" : "Quiz");
+                n.setInstructions("");
+                n.setActive(true);
+                return quizDefRepo.save(n);
+            });
+
         List<QuizQuestion> questions = questionRepo.findByQuizIdOrdered(def.getId());
         List<Long> qIds = questions.stream().map(QuizQuestion::getId).toList();
-        Map<Long, List<QuizOption>> options = optionRepo.findByQuestionIds(qIds).stream()
+        Map<Long, List<QuizOption>> options = qIds.isEmpty()
+            ? Map.of()
+            : optionRepo.findByQuestionIds(qIds).stream()
                 .collect(Collectors.groupingBy(o -> o.getQuestion().getId()));
 
         KnowledgeEvaluation ke = def.getKnowledgeEvaluation();
@@ -76,15 +89,23 @@ public class QuizService {
         List<QuizQuestionDTO> qdtos = new ArrayList<>();
         for (QuizQuestion q : questions) {
             List<QuizOptionDTO> odtos = (options.getOrDefault(q.getId(), List.of())).stream()
-                    .sorted(Comparator.comparing(QuizOption::getOrderIndex).thenComparing(QuizOption::getId))
-                    .map(o -> new QuizOptionDTO(o.getId(), o.getText(), o.isCorrect(), o.getOrderIndex()))
-                    .toList();
+                .sorted(Comparator.comparing(QuizOption::getOrderIndex).thenComparing(QuizOption::getId))
+                .map(o -> new QuizOptionDTO(o.getId(), o.getText(), o.isCorrect(), o.getOrderIndex()))
+                .toList();
             qdtos.add(new QuizQuestionDTO(q.getId(), q.getText(), q.getType(), q.getPoints(), q.getOrderIndex(), odtos));
         }
 
-        return new QuizDefinitionDTO(def.getId(), ke.getId(), def.getTitle(), def.getInstructions(),
-                ke.getPoints(), def.isActive(), qdtos);
+        return new QuizDefinitionDTO(
+            def.getId(),
+            ke.getId(),
+            def.getTitle(),
+            def.getInstructions(),
+            ke.getPoints(),          
+            def.isActive(),
+            qdtos                    // empty list on first call
+        );
     }
+
 
     @Transactional
     public QuizDefinitionDTO putDefinition(Long knowledgeEvaluationId, QuizDefinitionDTO dto) {

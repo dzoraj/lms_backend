@@ -134,4 +134,8 @@ public class KnowledgeEvaluationService extends AbstractCrudService<KnowledgeEva
 			entity.setLearningOutcomes(outcomes);
 		}
 	}
+    public List<KnowledgeEvaluationDTO> findBySubject(Long subjectId) {
+        return knowledgeEvaluationRepository.findBySubjectId(subjectId)
+                .stream().map(this::toDTO).collect(Collectors.toList());
+    }
 }

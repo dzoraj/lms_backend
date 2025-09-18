@@ -49,4 +49,16 @@ public interface KnowledgeEvaluationRepository extends SoftDeleteRepository<Know
             @Param("studyYearId") Long studyYearId,
             @Param("from") LocalDateTime from,
             @Param("to") LocalDateTime to);
+    
+    
+    
+    
+    
+    @Query("""
+    	      SELECT ke FROM KnowledgeEvaluation ke
+    	      WHERE ke.deleted = false
+    	        AND ke.courseRealization.subject.id = :subjectId
+    	      ORDER BY ke.startTime ASC, ke.id ASC
+    	    """)
+    	    List<KnowledgeEvaluation> findBySubjectId(@Param("subjectId") Long subjectId);
 }

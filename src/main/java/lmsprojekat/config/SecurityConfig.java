@@ -40,7 +40,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/schedule/**").hasAnyRole("ADMIN", "SA")
                 .requestMatchers("/api/library/**").hasAnyRole("ADMIN", "SA")
                 .requestMatchers("/api/faculty-supplies/**").hasAnyRole("ADMIN","SA")
-                .requestMatchers(HttpMethod.OPTIONS).permitAll() 
+                .requestMatchers("/api/quiz/**").permitAll() 
                 .anyRequest().authenticated()
             )
             .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
